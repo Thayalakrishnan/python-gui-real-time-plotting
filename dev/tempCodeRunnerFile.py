@@ -1,1 +1,0 @@
-        screenSize = graph.screen().size()

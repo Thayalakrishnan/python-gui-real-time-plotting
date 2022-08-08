@@ -58,10 +58,12 @@ class RangeFinder(QtWidgets.QWidget):
         self.container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.container.setFocusPolicy(Qt.StrongFocus)
         self.modifier = RangeFinderPlotter(graph)
+        
         ''' Buttons '''
         self.button_quick_scan = QtWidgets.QPushButton()
         self.button_quick_scan.setFixedSize(120,50)
         self.button_quick_scan.setText("Quick Scan")
+        self.button_quick_scan.setStyleSheet(QSSLEDGBOX)
         self.button_deep_scan = QtWidgets.QPushButton()
         self.button_deep_scan.setFixedSize(120,50)
         self.button_deep_scan.setText("Deep Scan")
@@ -229,6 +231,7 @@ class RangeFinderPlotter(QObject):
         customTheme.setGridEnabled(True)
         customTheme.setGridLineColor(QColor(QColorConstants.White))
         customTheme.setHighlightLightStrength(7.0)
+        
         # label
         customTheme.setLabelBackgroundColor(QColor(QColorConstants.Black))
         customTheme.setLabelBackgroundEnabled(True)
@@ -241,8 +244,9 @@ class RangeFinderPlotter(QObject):
         customTheme.setSingleHighlightColor(QColor(QColorConstants.White))
         #window 
         #customTheme.setWindowColor(QColor(QColorConstants.Black)) 
-        customTheme.setWindowColor(QColor(QColorConstants.Blue))
+        customTheme.setWindowColor(QColor(QColorConstants.White))
         self.graph.activeTheme().setType(Q3DTheme.ThemeUserDefined)
+        
         ''' shadow quality '''
         font = self.graph.activeTheme().font()
         font.setPointSize(12.0)
@@ -723,9 +727,112 @@ class CustomScanConsole(QtWidgets.QWidget):
         self.close()
 
 
+
+"""
+QSSLEDGBOX =
+
+QLabel {
+    background-color: black;
+    border-radius: 2px;
+    padding: 10px;
+    color: red;
+}
+
+
+self.GBox_Led.setStyleSheet(QSSLEDGBOX)
+"""
+
+QSSLEDGBOX = """
+QLabel {
+    background-color: black;
+    border-radius: 2px;
+    padding: 10px;
+    color: red;
+}
+
+QLCDNumber {
+    background-color: none;
+    color: red;
+    font-szie: 36px;    
+    border: none;  
+}
+"""
+
+
+from PyQt5.QtGui import QColor, QPalette
+''' Provides the Dark Theme '''
+def ScatterPlotTheme():
+    theme = Q3DTheme()
+    theme.setAmbientLightStrength(0.3)
+    theme.setBackgroundColor(QColor(QRgb(0x99ca53)))
+    theme.setBackgroundEnabled(True)
+    theme.setBaseColor(QColor(QRgb(0x209fdf)))
+    theme.setColorStyle(Q3DTheme.ColorStyleUniform)
+    theme.setFont(QFont("Impact"), 35)
+    theme.setGridEnabled(True)
+    theme.setGridLineColor(QColor(QRgb(0x99ca53)))
+    theme.setHighlightLightStrength(7.0)
+    theme.setLabelBackgroundColor(QColor(0xf6, 0xa6, 0x25, 0xa0))
+    theme.setLabelBackgroundEnabled(True)
+    theme.setLabelBorderEnabled(True)
+    theme.setLabelTextColor(QColor(QRgb(0x404044)))
+    theme.setLightColor(QColor(QColorConstants.White))
+    theme.setLightStrength(6.0)
+    theme.setMultiHighlightColor(QColor(QRgb(0x6d5fd5)))
+    theme.setSingleHighlightColor(QColor(QRgb(0xf6a625)))
+    theme.setWindowColor(QColor(QRgb(0xffffff)))
+    
+    #app.setPalette(darkPalette)
+    return theme
+
+def DarkTheme():
+    
+    darkPalette = QPalette()
+    # base
+    darkPalette.setColor(QPalette.WindowText, QColor(180, 180, 180))
+    darkPalette.setColor(QPalette.Window, QColor(53, 53, 53))
+    
+    darkPalette.setColor(QPalette.Light, QColor(180, 180, 180))
+    darkPalette.setColor(QPalette.Midlight, QColor(90, 90, 90))
+    darkPalette.setColor(QPalette.Dark, QColor(35, 35, 35))
+    
+    darkPalette.setColor(QPalette.Button, QColor(53, 53, 53))
+    darkPalette.setColor(QPalette.ButtonText, QColor(180, 180, 180))
+    
+    darkPalette.setColor(QPalette.Base, QColor(42, 42, 42))
+    darkPalette.setColor(QPalette.Shadow, QColor(20, 20, 20))
+    darkPalette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+    
+    darkPalette.setColor(QPalette.Text, QColor(180, 180, 180))
+    darkPalette.setColor(QPalette.BrightText, QColor(180, 180, 180))
+    darkPalette.setColor(QPalette.HighlightedText, QColor(180, 180, 180))
+    
+    darkPalette.setColor(QPalette.AlternateBase, QColor(66, 66, 66))
+    
+    darkPalette.setColor(QPalette.ToolTipBase, QColor(53, 53, 53))
+    darkPalette.setColor(QPalette.ToolTipText, QColor(180, 180, 180))
+    
+    darkPalette.setColor(QPalette.Link, QColor(56, 252, 196))
+    darkPalette.setColor(QPalette.LinkVisited, QColor(80, 80, 80))
+    
+    # disabled
+    darkPalette.setColor(QPalette.Disabled, QPalette.WindowText,QColor(127, 127, 127))
+    darkPalette.setColor(QPalette.Disabled, QPalette.Text,QColor(127, 127, 127))
+    darkPalette.setColor(QPalette.Disabled, QPalette.ButtonText,QColor(127, 127, 127))
+    darkPalette.setColor(QPalette.Disabled, QPalette.Highlight,QColor(80, 80, 80))
+    darkPalette.setColor(QPalette.Disabled, QPalette.HighlightedText,QColor(127, 127, 127))
+    
+    #app.setPalette(darkPalette)
+    return darkPalette
+
 if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
+    
+    app.setStyle('Fusion')
+    app.setStyleSheet(QSSLEDGBOX)
+    app.setPalette(DarkTheme())
+    
     w = RangeFinder()
     ''' Sliders '''
     w.button_quick_scan.clicked.connect(w.button_quick_scan_click)
@@ -734,5 +841,6 @@ if __name__ == '__main__':
     w.button_calibrate.clicked.connect(w.button_calibrate_click)
     w.button_ptu_control.clicked.connect(w.button_ptu_control_click)
     w.button_help.clicked.connect(w.button_help_click)
+    
     w.show()
     sys.exit(app.exec_())

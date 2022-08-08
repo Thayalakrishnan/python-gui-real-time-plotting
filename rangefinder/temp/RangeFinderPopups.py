@@ -44,8 +44,8 @@ from qtpy.QtWidgets import QApplication, QHBoxLayout, QLabel, QPushButton, QSize
 
 
 
-from RangeFinderPlotter import RangeFinderPlotter
-from RangeFinderSupport import DarkTheme
+from temp.RangeFinderPlotter import RangeFinderPlotter
+from theme import DarkTheme
 
 class ScanChooser(QtWidgets.QWidget):
     def __init__(self, parent=None):
