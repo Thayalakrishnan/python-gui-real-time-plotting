@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "python-gui-real-time-plotting"
+version = "0.1.0"
+description = "gui for real time plotting lidar data"
+authors = ["Lawen Thayalakrishnan"]
+license = "GPL3"
+
+[tool.poetry.dependencies]
+python = "3.8.5"
+numpy = "1.18.3"
+six = "1.14.0"
+PyQtDataVisualization = "5.14.0"
+PyQt5 = "5.14.2"
+PyQt5-sip = "12.7.2"
+pyserial = "3.4"
+pyqtgraph = "0.10.0"
+QtPy = "1.9.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
