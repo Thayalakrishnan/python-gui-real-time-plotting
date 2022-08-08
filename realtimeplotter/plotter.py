@@ -19,9 +19,9 @@ from qtpy.QtDatavisualization import (Q3DCamera, Q3DScatter, Q3DTheme,
   The graph is a scatter plot and is pannable and zoomable. """
   
 
-class RangeFinderPlotter(QObject):
+class Plotter(QObject):
     def __init__(self, scatter):
-        super(RangeFinderPlotter, self).__init__()
+        super(Plotter, self).__init__()
         self.graph = scatter  # graph instance passed in as arument
         self.m_fontSize = 12
         self.m_style = QAbstract3DSeries.MeshSphere

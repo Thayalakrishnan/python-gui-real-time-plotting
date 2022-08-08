@@ -24,9 +24,9 @@ from qtpy.QtDatavisualization import (Q3DCamera, Q3DScatter, Q3DTheme,
                                       QValue3DAxisFormatter)
 
 
-from rangefinder.plotter import RangeFinderPlotter
+from realtimeplotter.plotter import Plotter
 
-""" GraphConsole
+""" DetailedGraphWidget
     This class creates an instance of the graphing console
     the graphing console is a much more detailed scanning conole that provides real time 
     information regarding the current scan. it is instantiated right after triggering one of
@@ -35,9 +35,9 @@ from rangefinder.plotter import RangeFinderPlotter
     This Class subclasses the QtWidgets to create an instance 
 """
 ''' Generate the Graphing Console '''
-class GraphConsole(QtWidgets.QWidget):
+class DetailedGraphWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
-        super(GraphConsole, self).__init__(parent)
+        super(DetailedGraphWidget, self).__init__(parent)
         ''' Widgets '''
         self.run_scan = QtWidgets.QPushButton(text="Run Scan")
         self.run_scan.setFixedSize(120,50)
@@ -88,7 +88,7 @@ class GraphConsole(QtWidgets.QWidget):
         self.container.setMaximumSize(screenSize)
         self.container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.container.setFocusPolicy(Qt.StrongFocus)
-        self.modifier = RangeFinderPlotter(graph)
+        self.modifier = Plotter(graph)
         
         ''' Labels '''
         self.label_acc = QtWidgets.QLabel()

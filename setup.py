@@ -5,16 +5,16 @@
 """
 import sys
 from PyQt5.QtWidgets import QApplication
-from rangefinder.mainapp import RangeFinder
-from rangefinder.theme import GenerateTheme
+from realtimeplotter.real_time_plotter import RealTimePlotter
+from realtimeplotter.theme import ApplicationTheme
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
-    app.setPalette(GenerateTheme())
+    app.setPalette(ApplicationTheme())
     
-    w = RangeFinder()
+    w = RealTimePlotter()
     
     ''' 
     Initialise the Sliders 

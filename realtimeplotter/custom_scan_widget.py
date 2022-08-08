@@ -24,11 +24,11 @@ from qtpy.QtDatavisualization import (Q3DCamera, Q3DScatter, Q3DTheme,
                                       QValue3DAxisFormatter)
 
 
-from rangefinder.graphconsole import GraphConsole
+from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
 
 
 
-""" CustomScanConsole
+""" CustomScanWidget
     This class creates an instance of the custom scanning console
     the custom scan console houses sliders that allow the user to create a custom scan
     once the user is happy with the paramters, they hit proceed which will then pull the values
@@ -37,10 +37,10 @@ from rangefinder.graphconsole import GraphConsole
     This Class subclasses the QtWidgets to create an instance
 """
 
-class CustomScanConsole(QtWidgets.QWidget):
+class CustomScanWidget(QtWidgets.QWidget):
     """ The constructor."""
     def __init__(self, parent=None):
-        super(CustomScanConsole, self).__init__(parent)
+        super(CustomScanWidget, self).__init__(parent)
         ''' Widgets '''
         self.button_finish_setting_values = QtWidgets.QPushButton(text="Proceed")
         self.button_finish_setting_values.setFixedSize(120,50)
@@ -295,14 +295,14 @@ class CustomScanConsole(QtWidgets.QWidget):
     """ Button for main menu
       @param self The object pointer."""
     def button_main_menu_click(self):
-        self.main_menu = GraphConsole()
+        self.main_menu = DetailedGraphWidget()
         self.main_menu.show()
         self.main_menu.setAttribute(Qt.WA_DeleteOnClose)
         self.close()
     """ Button to trigger the beggining of the custom scan. takes the values here and sends them via serial to modify the scan
       @param self The object pointer."""
     def button_finish_setting_values_click(self):
-        self.finish_setting_values = GraphConsole()
+        self.finish_setting_values = DetailedGraphWidget()
         self.finish_setting_values.show()
         t_a = self.lcd_azimuth_min.value()
         t_b = self.lcd_azimuth_max.value()

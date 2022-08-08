@@ -24,9 +24,9 @@ from qtpy.QtDatavisualization import (Q3DCamera, Q3DScatter, Q3DTheme,
                                       QValue3DAxisFormatter)
 
 
-from rangefinder.plotter import RangeFinderPlotter
-from rangefinder.graphconsole import GraphConsole
-from rangefinder.custom_scan_widget import CustomScanConsole
+from realtimeplotter.plotter import Plotter
+from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
+from realtimeplotter.custom_scan_widget import CustomScanWidget
 
 
 """ RangeFinder Class
@@ -38,10 +38,10 @@ from rangefinder.custom_scan_widget import CustomScanConsole
     
     Methods from this class control the user interaction.
 """
-class RangeFinder(QtWidgets.QWidget):
+class RealTimePlotter(QtWidgets.QWidget):
     """ The constructor."""
     def __init__(self, parent=None): 
-        super(RangeFinder, self).__init__(parent)
+        super(RealTimePlotter, self).__init__(parent)
         self.message_le = QtWidgets.QLineEdit()
         self.message_le.setFixedSize(120,50)
         self.send_btn = QtWidgets.QPushButton(text="Send to Board",clicked=self.send)
@@ -64,7 +64,7 @@ class RangeFinder(QtWidgets.QWidget):
         self.container.setMaximumSize(screenSize)
         self.container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.container.setFocusPolicy(Qt.StrongFocus)
-        self.modifier = RangeFinderPlotter(graph)
+        self.modifier = Plotter(graph)
         
         ''' Buttons '''
         self.button_quick_scan = QtWidgets.QPushButton()
@@ -163,7 +163,7 @@ class RangeFinder(QtWidgets.QWidget):
     """ Button to trigger a quick scan
     #  @param self The object pointer"""
     def button_quick_scan_click(self):
-        self.quick_scan = GraphConsole()
+        self.quick_scan = DetailedGraphWidget()
         self.quick_scan.show()
         self.quick_scan.setAttribute(Qt.WA_DeleteOnClose)
         # Output Command
@@ -172,7 +172,7 @@ class RangeFinder(QtWidgets.QWidget):
     """ Button to trigger a deep scan
     #  @param self The object pointer"""
     def button_deep_scan_click(self):
-        self.deep_scan = GraphConsole()
+        self.deep_scan = DetailedGraphWidget()
         self.deep_scan.show()
         self.deep_scan.setAttribute(Qt.WA_DeleteOnClose)
         # Output Command
@@ -181,7 +181,7 @@ class RangeFinder(QtWidgets.QWidget):
     """ Button to trigger a custom scan
     #  @param self The object pointer"""
     def button_custom_scan_click(self):
-        self.custom_scan = CustomScanConsole()
+        self.custom_scan = CustomScanWidget()
         self.custom_scan.slider_azimuth_max.valueChanged.connect(self.custom_scan.azimuth_max_change)
         self.custom_scan.slider_azimuth_min.valueChanged.connect(self.custom_scan.azimuth_min_change)
         self.custom_scan.slider_elevation_max.valueChanged.connect(self.custom_scan.elevation_max_change)
@@ -199,7 +199,7 @@ class RangeFinder(QtWidgets.QWidget):
     """ Button to trigger a calibration
     #  @param self The object pointer"""
     def button_calibrate_click(self):
-        self.quick_scan = GraphConsole()
+        self.quick_scan = DetailedGraphWidget()
         self.quick_scan.show()
         self.quick_scan.setAttribute(Qt.WA_DeleteOnClose)
         # Output Command
