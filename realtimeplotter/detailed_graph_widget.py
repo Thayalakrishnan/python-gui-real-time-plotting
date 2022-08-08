@@ -43,6 +43,12 @@ def CreateLabel(label_text, label_size_width, label_size_height) -> QtWidgets.QL
     label.setText(label_text)
     return label
 
+def CreateLCDLabelHBox(lcd_widget, label_widget) -> QtWidgets.QLabel:
+    h_lay = QtWidgets.QHBoxLayout()
+    h_lay.addWidget(lcd_widget)
+    h_lay.addWidget(label_widget)
+    return h_lay
+
 """ DetailedGraphWidget
     This class creates an instance of the graphing console
     the graphing console is a much more detailed scanning conole that provides real time 
@@ -72,7 +78,8 @@ class DetailedGraphWidget(QtWidgets.QWidget):
         graph = Q3DScatter()
         screenSize = graph.screen().size()
         self.graph_container = QtWidgets.QWidget.createWindowContainer(graph)
-        self.graph_container.setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5))
+        #self.graph_container.setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5))
+        self.graph_container.setMinimumSize(QSize(300, 300))
         self.graph_container.setMaximumSize(screenSize)
         self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.graph_container.setFocusPolicy(Qt.StrongFocus)
@@ -88,25 +95,47 @@ class DetailedGraphWidget(QtWidgets.QWidget):
 
 
         ''' Layout '''
-        self.horizontal_layout = QtWidgets.QHBoxLayout(self)
-        self.horizontal_layout.addWidget(self.graph_container, 1)
         
-        self.vertical_layout = QtWidgets.QVBoxLayout()
-        self.horizontal_layout.addLayout(self.vertical_layout)
+        #self.horizontal_layout = QtWidgets.QHBoxLayout(self)
+        #self.horizontal_layout.addWidget(self.graph_container, 1)        
+        #self.vertical_layout = QtWidgets.QVBoxLayout()
+        #self.horizontal_layout.addLayout(self.vertical_layout)
+
+        self.vertical_layout = QtWidgets.QVBoxLayout(self)
+        self.vertical_layout.addWidget(self.graph_container, 1)
+
+        self.vertical_layout_two = QtWidgets.QVBoxLayout()
+        self.vertical_layout.addLayout(self.vertical_layout_two, 2)
         
-        self.vertical_layout.addWidget(self.run_scan)
-        self.vertical_layout.addWidget(self.stop_scan)
-        self.vertical_layout.addWidget(self.label_acc)
-        self.vertical_layout.addWidget(self.lcd_acc)
-        self.vertical_layout.addWidget(self.label_gyr)
-        self.vertical_layout.addWidget(self.lcd_gyr)
-        self.vertical_layout.addWidget(self.label_mag)
-        self.vertical_layout.addWidget(self.lcd_mag)
-        self.vertical_layout.addWidget(self.label_azi)
-        self.vertical_layout.addWidget(self.lcd_azi)
-        self.vertical_layout.addWidget(self.label_ele)
-        self.vertical_layout.addWidget(self.lcd_ele)
-        self.vertical_layout.addWidget(self.label_dis)
-        self.vertical_layout.addWidget(self.lcd_dis)
+        #h_layout1 = QtWidgets.QHBoxLayout()
+        #h_layout1.addWidget(self.run_scan)
+        #h_layout1.addWidget(self.stop_scan)
+        self.vertical_layout_two.addLayout(CreateLCDLabelHBox(self.run_scan, self.stop_scan))
+        self.vertical_layout_two.addLayout(CreateLCDLabelHBox(self.label_acc, self.lcd_acc))
+        self.vertical_layout_two.addLayout(CreateLCDLabelHBox(self.label_gyr, self.lcd_gyr))
+        self.vertical_layout_two.addLayout(CreateLCDLabelHBox(self.label_mag, self.lcd_mag))
+        self.vertical_layout_two.addLayout(CreateLCDLabelHBox(self.label_azi, self.lcd_azi))
+        self.vertical_layout_two.addLayout(CreateLCDLabelHBox(self.label_ele, self.lcd_ele))
+        self.vertical_layout_two.addLayout(CreateLCDLabelHBox(self.label_dis, self.lcd_dis))
+        
+        #self.vertical_layout.addWidget(self.run_scan)
+        #self.vertical_layout.addWidget(self.stop_scan)
+        
+        #self.vertical_layout.addLayout(h_layout1)
+        
+        #self.vertical_layout.addWidget(self.label_acc)
+        #self.vertical_layout.addWidget(self.lcd_acc)
+        #self.vertical_layout.addWidget(self.label_gyr)
+        #self.vertical_layout.addWidget(self.lcd_gyr)
+        #self.vertical_layout.addWidget(self.label_mag)
+        #self.vertical_layout.addWidget(self.lcd_mag)
+        #self.vertical_layout.addWidget(self.label_azi)
+        #self.vertical_layout.addWidget(self.lcd_azi)
+        #self.vertical_layout.addWidget(self.label_ele)
+        #self.vertical_layout.addWidget(self.lcd_ele)
+        #self.vertical_layout.addWidget(self.label_dis)
+        #self.vertical_layout.addWidget(self.lcd_dis)
+        
+        
         self.setWindowTitle("Graph Console")
 
