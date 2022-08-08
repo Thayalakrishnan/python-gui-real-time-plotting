@@ -87,17 +87,17 @@ class Plotter(QObject):
         
         """ Configure axis"""        
         self.xaxis_proxy = QValue3DAxisFormatter()
-        self.xaxis = CreateAxis(self.xaxis_proxy, "X axis (azimuth)", True, 5, 2)
+        self.xaxis = CreateAxis(QValue3DAxisFormatter(), "X axis (azimuth)", True, 5, 2)
         self.graph.addAxis(self.xaxis)
         self.graph.setAxisX(self.xaxis)
         
         self.yaxis_proxy = QValue3DAxisFormatter()
-        self.yaxis = CreateAxis(self.yaxis_proxy, "Y axis (elevation)", True, 5, 2)
+        self.yaxis = CreateAxis(QValue3DAxisFormatter(), "Y axis (elevation)", True, 5, 2)
         self.graph.addAxis(self.yaxis)
         self.graph.setAxisY(self.yaxis)
         
         self.zaxis_proxy = QValue3DAxisFormatter()
-        self.zaxis = CreateAxis(self.zaxis_proxy, "Z axis (depth/range)", True, 5, 2)
+        self.zaxis = CreateAxis(QValue3DAxisFormatter(), "Z axis (depth/range)", True, 5, 2)
         self.graph.addAxis(self.zaxis)
         self.graph.setAxisZ(self.zaxis)
         
