@@ -38,10 +38,10 @@ from realtimeplotter.custom_scan_widget import CustomScanWidget
     
     Methods from this class control the user interaction.
 """
-class RealTimePlotter(QtWidgets.QWidget):
+class RealTimePlotterWidget(QtWidgets.QWidget):
     """ The constructor."""
     def __init__(self, parent=None): 
-        super(RealTimePlotter, self).__init__(parent)
+        super(RealTimePlotterWidget, self).__init__(parent)
         self.message_le = QtWidgets.QLineEdit()
         self.message_le.setFixedSize(120,50)
         self.send_btn = QtWidgets.QPushButton(text="Send to Board",clicked=self.send)

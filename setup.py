@@ -5,7 +5,7 @@
 """
 import sys
 from PyQt5.QtWidgets import QApplication
-from realtimeplotter.real_time_plotter import RealTimePlotter
+from realtimeplotter.real_time_plotter_widget import RealTimePlotterWidget
 from realtimeplotter.theme import ApplicationTheme
 
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
     app.setPalette(ApplicationTheme())
     
-    w = RealTimePlotter()
+    w = RealTimePlotterWidget()
     
     ''' 
     Initialise the Sliders 
