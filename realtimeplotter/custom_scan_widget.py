@@ -3,28 +3,10 @@
   The classes dont take any input and run off of each other. Button input triggers the 
  instance of one of these classes as every class generates a new window, except the plotting 
 """
-import collections, math, struct, sys, time, copy, serial
-import numpy as np
-from threading import Thread
-from PyQt5 import QtSerialPort, QtGui, QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-
-
-from qtpy.uic import loadUi
-from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtCore import QLocale, QObject, QSize, Qt, QTimer
-from qtpy.QtGui import QColor, QColorConstants, QFont, QVector3D, qRgb, QPalette
-from qtpy.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QGroupBox,
-                            QFontComboBox, QFrame, QHBoxLayout, QLabel, 
-                            QLCDNumber, QMainWindow, QPushButton, 
-                            QSizePolicy, QSlider, QVBoxLayout, QWidget, QStyleFactory, QStyle)
-from qtpy.QtDatavisualization import (Q3DCamera, Q3DScatter, Q3DTheme,
-                                      QAbstract3DAxis, QAbstract3DGraph,
-                                      QAbstract3DSeries, QCustom3DItem,
-                                      QScatter3DSeries, QScatterDataItem,
-                                      QScatterDataProxy, QValue3DAxis,
-                                      QValue3DAxisFormatter)
-
+from PyQt5 import QtSerialPort
+from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QHBoxLayout
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 
 from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
 from realtimeplotter.helpers import LCDWidgetHelper, LabelWidgetHelper, SliderWidgetHelper, HBoxLayoutHelper, GenericLayoutHelper
@@ -88,7 +70,7 @@ LCD_HEIGHT = STANDARD_HEIGHT
     This Class subclasses the QtWidgets to create an instance
 """
 
-class CustomScanWidget(QtWidgets.QWidget):
+class CustomScanWidget(QWidget):
   
     """ The constructor."""
     def __init__(self, parent=None):
@@ -98,10 +80,10 @@ class CustomScanWidget(QtWidgets.QWidget):
         self.serial = QtSerialPort.QSerialPort('COM4',baudRate=QtSerialPort.QSerialPort.Baud9600)
         
         """ Buttons """
-        self.button_finish_setting_values = QtWidgets.QPushButton(text="Accept")
+        self.button_finish_setting_values = QPushButton(text="Accept")
         self.button_finish_setting_values.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         
-        self.button_main_menu = QtWidgets.QPushButton(text="Close")
+        self.button_main_menu = QPushButton(text="Close")
         self.button_main_menu.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
                                 
         """labels"""
@@ -133,36 +115,36 @@ class CustomScanWidget(QtWidgets.QWidget):
 
         """ Group Widget """
         self.GBox_Azimuth = QGroupBox(self, title="Azimuth")
-        self.Vbox_Azimuth = QtWidgets.QVBoxLayout()
+        self.Vbox_Azimuth = QVBoxLayout()
         self.GBox_Azimuth.setLayout(self.Vbox_Azimuth)
         self.Vbox_Azimuth.addLayout(HBoxLayoutHelper([self.label_azimuth_min, self.slider_azimuth_min, self.lcd_azimuth_min]))
         self.Vbox_Azimuth.addLayout(HBoxLayoutHelper([self.label_azimuth_max, self.slider_azimuth_max, self.lcd_azimuth_max]))
 
         self.GBox_Elevation = QGroupBox(self, title="Elevation")
-        self.Vbox_Elevation = QtWidgets.QVBoxLayout()
+        self.Vbox_Elevation = QVBoxLayout()
         self.GBox_Elevation.setLayout(self.Vbox_Elevation)
         self.Vbox_Elevation.addLayout(HBoxLayoutHelper([self.label_elevation_min, self.slider_elevation_min, self.lcd_elevation_min]))
         self.Vbox_Elevation.addLayout(HBoxLayoutHelper([self.label_elevation_max, self.slider_elevation_max, self.lcd_elevation_max]))
 
         self.GBox_StepChange = QGroupBox(self, title="Step Change")
-        self.Vbox_StepChange = QtWidgets.QVBoxLayout()        
+        self.Vbox_StepChange = QVBoxLayout()        
         self.GBox_StepChange.setLayout(self.Vbox_StepChange)
         self.Vbox_StepChange.addLayout(HBoxLayoutHelper([self.label_step_change, self.slider_step_change, self.lcd_step_change]))
         
         self.GBox_ScanFrequency = QGroupBox(self, title="Scan Frequency")
-        self.Vbox_ScanFrequency = QtWidgets.QVBoxLayout()        
+        self.Vbox_ScanFrequency = QVBoxLayout()        
         self.GBox_ScanFrequency.setLayout(self.Vbox_ScanFrequency)
         self.Vbox_ScanFrequency.addLayout(HBoxLayoutHelper([self.label_scan_frequency, self.slider_scan_frequency, self.lcd_scan_frequency]))
         
         self.GBox_SamplesPerOrientaiton = QGroupBox(self, title="Samples Per Orientaiton")
-        self.Vbox_SamplesPerOrientaiton = QtWidgets.QVBoxLayout()        
+        self.Vbox_SamplesPerOrientaiton = QVBoxLayout()        
         self.GBox_SamplesPerOrientaiton.setLayout(self.Vbox_SamplesPerOrientaiton)
         self.Vbox_SamplesPerOrientaiton.addLayout(HBoxLayoutHelper([self.label_samples_orientation, self.slider_samples_orientation, self.lcd_samples_orientation]))
         
         """ Main Layout """
-        self.Vbox = QtWidgets.QVBoxLayout(self)
-        self.vertical_layout_one = QtWidgets.QVBoxLayout()
-        self.horizontal_layout_one = QtWidgets.QHBoxLayout()
+        self.Vbox = QVBoxLayout(self)
+        self.vertical_layout_one = QVBoxLayout()
+        self.horizontal_layout_one = QHBoxLayout()
         self.Vbox.addLayout(self.vertical_layout_one)
         self.Vbox.addLayout(self.horizontal_layout_one)    
         GenericLayoutHelper(self.horizontal_layout_one, [self.button_finish_setting_values, self.button_main_menu])
@@ -170,7 +152,7 @@ class CustomScanWidget(QtWidgets.QWidget):
         self.setWindowTitle("Define Custom Scan Parameters")
         
         # configure global application font
-        font = QtGui.QFont()
+        font = QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(12)
         font.setKerning(False)
