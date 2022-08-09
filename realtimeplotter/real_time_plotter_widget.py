@@ -162,8 +162,12 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
         
         """ Serial Connection configuration """
         self.serial = QtSerialPort.QSerialPort(
-            "COM4", baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive
+            "COM5", 
+            baudRate=QtSerialPort.QSerialPort.Baud9600, 
+            readyRead=self.receive
         )
+        
+        self.serial.open(self.serial.ReadWrite)
         self.setWindowTitle("Range Finder")
         
         """ commands """
@@ -184,34 +188,39 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
     def receive(self):
         while self.serial.canReadLine():
             raw_input_data = self.serial.readLine().data().decode()
-            self.textedit_output.append(raw_input_data)
-            raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
-            theta = math.radians(raw_input_data[1])
-            phi = math.radians(raw_input_data[0])
-            distance = raw_input_data[2]
-
-            x_val = distance * math.sin(theta) * math.cos(phi)
-            y_val = distance * math.sin(theta) * math.sin(phi)
-            z_val = distance * math.cos(theta)
+            print(raw_input_data)
+            self.textedit_output.append(f"{raw_input_data}")
             
-            self.textedit_output.append(f"x = {x_val} y = {y_val} z = {z_val}")
-            self.plotbank.append(f"x = {x_val} y = {y_val} z = {z_val}")
-            
-            pos = QVector3D(x_val, z_val, y_val)
-            self.modifier.addCustomItem(pos)
+            #raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
+            #theta = math.radians(raw_input_data[1])
+            #phi = math.radians(raw_input_data[0])
+            #distance = raw_input_data[2]
+            #x_val = distance * math.sin(theta) * math.cos(phi)
+            #y_val = distance * math.sin(theta) * math.sin(phi)
+            #z_val = distance * math.cos(theta)
+            #self.textedit_output.append(f"x = {x_val} y = {y_val} z = {z_val}")
+            #self.plotbank.append(f"x = {x_val} y = {y_val} z = {z_val}")
+            #pos = QVector3D(x_val, z_val, y_val)
+            #self.modifier.addCustomItem(pos)
 
     """ Method to send commands via serial
     #  @param self The object pointer"""
 
     @pyqtSlot()
     def send(self):
-        self.serial.write(self.lineedit_message.text().encode())
+        #self.serial.write(self.lineedit_message.text().encode())
+        command = f'{"hello"}\r\n'
+        self.serial.write(command.encode())
+        self.textedit_output.append(f"[Sent] {command}")
+        # self.serial.waitForBytesWritten(1000)
+        
 
     """ Method to create a serial connection with the board
     #  @param self The object pointer"""
 
     @pyqtSlot(bool)
     def on_toggled(self, checked):
+        self.textedit_output.append(f"{'Connected' if checked else 'Disconnected'}")
         self.button_connect.setText("Disconnect" if checked else "Connect")
         self.button_connect.setStyleSheet(
             "background-color: green" if checked else "background-color: red"
