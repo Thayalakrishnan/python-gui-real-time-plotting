@@ -12,7 +12,7 @@ from qtpy.uic import loadUi
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QLocale, QObject, QSize, Qt, QTimer
 from qtpy.QtGui import QColor, QColorConstants, QFont, QVector3D, qRgb, QPalette
-from qtpy.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, 
+from qtpy.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QGroupBox,
                             QFontComboBox, QFrame, QHBoxLayout, QLabel, 
                             QLCDNumber, QMainWindow, QPushButton, 
                             QSizePolicy, QSlider, QVBoxLayout, QWidget, QStyleFactory, QStyle)
@@ -25,6 +25,42 @@ from qtpy.QtDatavisualization import (Q3DCamera, Q3DScatter, Q3DTheme,
 
 
 from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
+from realtimeplotter.helpers import LCDWidgetHelper, LabelWidgetHelper, SliderWidgetHelper, HBoxLayoutHelper
+
+
+
+
+
+"""
+Custom scan boundary values
+"""
+AZIMUTH_MIN_LOW = 30
+AZIMUTH_MIN_HIGH = 155
+AZIMUTH_STEP = 1
+
+AZIMUTH_MAX_LOW = 35
+AZIMUTH_MAX_HIGH = 160
+AZIMUTH_STEP = 1
+
+ELEVATE_MIN_LOW = -60
+ELEVATE_MIN_HIGH = 55
+ELEVATE_STEP = 1
+
+ELEVATE_MAX_LOW = -55
+ELEVATE_MAX_HIGH = 60
+ELEVATE_STEP = 1
+
+STEP_CHANGE_LOW = 5
+STEP_CHANGE_HIGH = 200
+STEP_CHANGE_STEP = 1
+
+SAMPLE_FREQUENCY_LOW = 1
+SAMPLE_FREQUENCY_HIGH = 100
+SAMPLE_FREQUENCY_STEP = 1
+
+SAMPLES_PER_ORIENTATION_LOW = 3
+SAMPLES_PER_ORIENTATION_HIGH = 10
+SAMPLES_PER_ORIENTATION_STEP = 1
 
 
 
@@ -42,221 +78,94 @@ class CustomScanWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(CustomScanWidget, self).__init__(parent)
         ''' Widgets '''
+        self.serial = QtSerialPort.QSerialPort('COM4',baudRate=QtSerialPort.QSerialPort.Baud9600)
+        
         self.button_finish_setting_values = QtWidgets.QPushButton(text="Proceed")
         self.button_finish_setting_values.setFixedSize(120,50)
+        
         self.button_main_menu = QtWidgets.QPushButton(text="Main Menu")
         self.button_main_menu.setFixedSize(120,50)
-        self.serial = QtSerialPort.QSerialPort('COM4',baudRate=QtSerialPort.QSerialPort.Baud9600)
+                
         # configure global application font
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(12)
         font.setKerning(False)
-        ''' set bounds '''
-        set_azimuth_min_low = 30
-        set_azimuth_min_high = 155
-        set_azimuth_min_step = 1
-        set_azimuth_max_low = 35
-        set_azimuth_max_high = 160
-        set_azimuth_max_step = 1
-        set_elevate_min_low = -60
-        set_elevate_min_high = 55
-        set_elevate_min_step = 1
-        set_elevate_max_low = -55
-        set_elevate_max_high = 60
-        set_elevate_max_step = 1
-        set_sample_frequency_low = 1
-        set_sample_frequency_high = 100
-        set_sample_frequency_step = 1
-        set_samples_per_orientation_low = 3
-        set_samples_per_orientation_high = 10
-        set_samples_per_orientation_step = 1
-        set_step_change_low = 5
-        set_step_change_high = 200
-        set_step_change_step = 1
+        self.setFont(font)
+                
+        '''labels'''
+        self.label_azimuth_min = LabelWidgetHelper("Azimuth Min", 120, 50)
+        self.label_azimuth_max = LabelWidgetHelper("Azimuth Max", 120, 50)
+        self.label_elevation_min = LabelWidgetHelper("Elevation Max", 120, 50)
+        self.label_elevation_max = LabelWidgetHelper("Elevation Max", 120, 50)
+        self.label_step_change = LabelWidgetHelper("Step Change", 120, 50)
+        self.label_scan_frequency = LabelWidgetHelper("Scan Frequency", 120, 50)
+        self.label_samples_orientation = LabelWidgetHelper("Samples/Orientation", 120, 50)
         
-        self.groupbox_custom_scan = QtWidgets.QGroupBox()
-        self.groupbox_custom_scan.setFont(font)
-        ''' Accelerometer '''
-        self.lcd_acc = QtWidgets.QLCDNumber()
-        self.lcd_acc.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.lcd_acc.setSmallDecimalPoint(False)
-        self.lcd_acc.setObjectName("lcd_acc")
-        self.lcd_acc.setFixedSize(120,50)
-        '''begin'''
-        self.label_azimuth_max = QtWidgets.QLabel()
-        self.label_azimuth_max.setFixedSize(120,50)
-        self.label_azimuth_max.setFont(font)
-        self.label_azimuth_max.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label_azimuth_max.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_azimuth_max.setText("Azimuth Max")
+        '''sliders'''
+        self.slider_azimuth_min = SliderWidgetHelper(250, 50, AZIMUTH_MIN_LOW, AZIMUTH_MIN_HIGH, AZIMUTH_STEP)
+        self.slider_azimuth_max = SliderWidgetHelper(250, 50, AZIMUTH_MAX_LOW, AZIMUTH_MAX_HIGH, AZIMUTH_STEP)
+        self.slider_elevation_min = SliderWidgetHelper(250, 50, ELEVATE_MIN_LOW, ELEVATE_MIN_HIGH, ELEVATE_STEP)
+        self.slider_elevation_max = SliderWidgetHelper(250, 50, ELEVATE_MAX_LOW, ELEVATE_MAX_HIGH, ELEVATE_STEP)
+        self.slider_step_change = SliderWidgetHelper(250, 50, STEP_CHANGE_LOW, STEP_CHANGE_HIGH, STEP_CHANGE_STEP)
+        self.slider_scan_frequency = SliderWidgetHelper(250, 50, SAMPLE_FREQUENCY_LOW, SAMPLE_FREQUENCY_HIGH, SAMPLE_FREQUENCY_STEP)
+        self.slider_samples_orientation = SliderWidgetHelper(250, 50, SAMPLES_PER_ORIENTATION_LOW, SAMPLES_PER_ORIENTATION_HIGH, SAMPLES_PER_ORIENTATION_STEP)
+        
+        ''' LCDs '''
+        self.lcd_azimuth_min = LCDWidgetHelper("lcd_azi_min", False, 120, 50)
+        self.lcd_azimuth_max = LCDWidgetHelper("lcd_azi_max", False, 120, 50)
+        self.lcd_elevation_min = LCDWidgetHelper("lcd_ele_min", False, 120, 50)
+        self.lcd_elevation_max = LCDWidgetHelper("lcd_ele_max", False, 120, 50)
+        self.lcd_step_change = LCDWidgetHelper("lcd_step_change", False, 120, 50)
+        self.lcd_scan_frequency = LCDWidgetHelper("lcd_scan_freq", False, 120, 50)
+        self.lcd_samples_orientation = LCDWidgetHelper("lcd_samp_ori", False, 120, 50)
 
-        self.label_azimuth_min = QtWidgets.QLabel()
-        self.label_azimuth_min.setFixedSize(120,50)
-        self.label_azimuth_min.setFont(font)
-        self.label_azimuth_min.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label_azimuth_min.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_azimuth_min.setText("Azimuth Min")
-        
-        self.label_elevation_max = QtWidgets.QLabel()
-        self.label_elevation_max.setFixedSize(120,50)
-        self.label_elevation_max.setFont(font)
-        self.label_elevation_max.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label_elevation_max.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_elevation_max.setText("Elevation Max")
-        
-        self.label_elevation_min = QtWidgets.QLabel()
-        self.label_elevation_min.setFixedSize(120,50)
-        self.label_elevation_min.setFont(font)
-        self.label_elevation_min.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label_elevation_min.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_elevation_min.setText("Elevation Max")
-        
-        self.label_step_change = QtWidgets.QLabel()
-        self.label_step_change.setFixedSize(120,50)
-        self.label_step_change.setFont(font)
-        self.label_step_change.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label_step_change.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_step_change.setText("Step Change")
-        
-        self.label_scan_frequency = QtWidgets.QLabel()
-        self.label_scan_frequency.setFixedSize(120,50)
-        self.label_scan_frequency.setFont(font)
-        self.label_scan_frequency.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label_scan_frequency.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_scan_frequency.setText("Scan Frequency")
-        
-        self.label_samples_orientation = QtWidgets.QLabel()
-        self.label_samples_orientation.setFixedSize(120,50)
-        self.label_samples_orientation.setFont(font)
-        self.label_samples_orientation.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label_samples_orientation.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_samples_orientation.setText("Samples/Orientation")
-        '''sliders start'''
-        self.slider_azimuth_max = QtWidgets.QSlider()
-        self.slider_azimuth_max.setFixedSize(250,50)
-        self.slider_azimuth_max.setFont(font)
-        self.slider_azimuth_max.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_azimuth_max.setMinimum(set_azimuth_min_low)
-        self.slider_azimuth_max.setMaximum(set_azimuth_min_high)
-        self.slider_azimuth_max.setSingleStep(set_azimuth_min_step)
-        
-        self.slider_azimuth_min = QtWidgets.QSlider()
-        self.slider_azimuth_min.setFixedSize(250,50)
-        self.slider_azimuth_min.setFont(font)
-        self.slider_azimuth_min.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_azimuth_min.setMinimum(set_azimuth_max_low)
-        self.slider_azimuth_min.setMaximum(set_azimuth_max_high)
-        self.slider_azimuth_min.setSingleStep(set_azimuth_max_step)
-        
-        self.slider_scan_frequency = QtWidgets.QSlider()
-        self.slider_scan_frequency.setFixedSize(250,50)
-        self.slider_scan_frequency.setFont(font)
-        self.slider_scan_frequency.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_scan_frequency.setMinimum(set_sample_frequency_low)
-        self.slider_scan_frequency.setMaximum(set_sample_frequency_high)
-        self.slider_scan_frequency.setSingleStep(set_sample_frequency_step)
 
-        self.slider_elevation_max = QtWidgets.QSlider()
-        self.slider_elevation_max.setFixedSize(250,50)
-        self.slider_elevation_max.setFont(font)
-        self.slider_elevation_max.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_elevation_max.setMinimum(set_elevate_max_low)
-        self.slider_elevation_max.setMaximum(set_elevate_max_high)
-        self.slider_elevation_max.setSingleStep(set_elevate_max_step)
 
-        self.slider_elevation_min = QtWidgets.QSlider()
-        self.slider_elevation_min.setFixedSize(250,50)
-        self.slider_elevation_min.setFont(font)
-        self.slider_elevation_min.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_elevation_min.setMinimum(set_elevate_min_low)
-        self.slider_elevation_min.setMaximum(set_elevate_min_high)
-        self.slider_elevation_min.setSingleStep(set_elevate_min_step)
-        
-        self.slider_step_change = QtWidgets.QSlider()
-        self.slider_step_change.setFixedSize(250,50)
-        self.slider_step_change.setFont(font)
-        self.slider_step_change.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_step_change.setMinimum(set_step_change_low)
-        self.slider_step_change.setMaximum(set_step_change_high)
-        self.slider_step_change.setSingleStep(set_step_change_step)
-        
-        self.slider_samples_orientation = QtWidgets.QSlider()
-        self.slider_samples_orientation.setFixedSize(250,50)
-        self.slider_samples_orientation.setFont(font)
-        self.slider_samples_orientation.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_samples_orientation.setMinimum(set_samples_per_orientation_low)
-        self.slider_samples_orientation.setMaximum(set_samples_per_orientation_high)
-        self.slider_samples_orientation.setSingleStep(set_samples_per_orientation_step)
-        ''' LCD '''
-        self.lcd_azimuth_max = QtWidgets.QLCDNumber()
-        self.lcd_azimuth_max.setFixedSize(120,50)
-        self.lcd_azimuth_max.setFont(font)
-        self.lcd_azimuth_max.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.lcd_azimuth_max.setFrameShadow(QtWidgets.QFrame.Plain)        
-        self.lcd_azimuth_min = QtWidgets.QLCDNumber()
-        self.lcd_azimuth_min.setFixedSize(120,50)
-        self.lcd_azimuth_min.setFont(font)
-        self.lcd_azimuth_min.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.lcd_azimuth_min.setFrameShadow(QtWidgets.QFrame.Plain)        
-        self.lcd_elevation_max = QtWidgets.QLCDNumber()
-        self.lcd_elevation_max.setFixedSize(120,50)
-        self.lcd_elevation_max.setFont(font)
-        self.lcd_elevation_max.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.lcd_elevation_max.setFrameShadow(QtWidgets.QFrame.Plain)        
-        self.lcd_elevation_min = QtWidgets.QLCDNumber()
-        self.lcd_elevation_min.setFixedSize(120,50)
-        self.lcd_elevation_min.setFont(font)
-        self.lcd_elevation_min.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.lcd_elevation_min.setFrameShadow(QtWidgets.QFrame.Plain)        
-        self.lcd_step_change = QtWidgets.QLCDNumber()
-        self.lcd_step_change.setFixedSize(120,50)
-        self.lcd_step_change.setFont(font)
-        self.lcd_step_change.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.lcd_step_change.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.lcd_scan_frequency = QtWidgets.QLCDNumber()
-        self.lcd_scan_frequency.setFixedSize(120,50)
-        self.lcd_scan_frequency.setFont(font)
-        self.lcd_scan_frequency.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.lcd_scan_frequency.setFrameShadow(QtWidgets.QFrame.Plain)        
-        self.lcd_samples_orientation = QtWidgets.QLCDNumber()
-        self.lcd_samples_orientation.setFixedSize(120,50)
-        self.lcd_samples_orientation.setFont(font)
-        self.lcd_samples_orientation.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.lcd_samples_orientation.setFrameShadow(QtWidgets.QFrame.Plain)
+
+
         ''' Layout '''
         self.horizontal_layout = QtWidgets.QHBoxLayout(self)
+        
         self.vertical_layout_one = QtWidgets.QVBoxLayout()
         self.vertical_layout_two = QtWidgets.QVBoxLayout()
-        self.vertical_layout_three = QtWidgets.QVBoxLayout()
-        self.horizontal_layout.addWidget(self.button_main_menu)
-        self.horizontal_layout.addWidget(self.button_finish_setting_values)
+        
         self.horizontal_layout.addLayout(self.vertical_layout_one)
-        self.horizontal_layout.addLayout(self.vertical_layout_two)
-        self.horizontal_layout.addLayout(self.vertical_layout_three)
+        self.horizontal_layout.addLayout(self.vertical_layout_two)       
+        
+        self.vertical_layout_one.addWidget(self.button_main_menu)
+        self.vertical_layout_one.addWidget(self.button_finish_setting_values)
+        
         ''' Add Widget '''
-        self.vertical_layout_one.addWidget(self.label_azimuth_max)
-        self.vertical_layout_one.addWidget(self.label_azimuth_min)
-        self.vertical_layout_one.addWidget(self.label_elevation_max)
-        self.vertical_layout_one.addWidget(self.label_elevation_min)
-        self.vertical_layout_one.addWidget(self.label_step_change)
-        self.vertical_layout_one.addWidget(self.label_scan_frequency)
-        self.vertical_layout_one.addWidget(self.label_samples_orientation)
-        self.vertical_layout_two.addWidget(self.slider_azimuth_max)
-        self.vertical_layout_two.addWidget(self.slider_azimuth_min)
-        self.vertical_layout_two.addWidget(self.slider_elevation_max)
-        self.vertical_layout_two.addWidget(self.slider_elevation_min)
-        self.vertical_layout_two.addWidget(self.slider_step_change)
-        self.vertical_layout_two.addWidget(self.slider_scan_frequency)
-        self.vertical_layout_two.addWidget(self.slider_samples_orientation)
-        self.vertical_layout_three.addWidget(self.lcd_azimuth_max)
-        self.vertical_layout_three.addWidget(self.lcd_azimuth_min)
-        self.vertical_layout_three.addWidget(self.lcd_elevation_max)
-        self.vertical_layout_three.addWidget(self.lcd_elevation_min)
-        self.vertical_layout_three.addWidget(self.lcd_step_change)
-        self.vertical_layout_three.addWidget(self.lcd_scan_frequency)
-        self.vertical_layout_three.addWidget(self.lcd_samples_orientation)
+        #self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_azimuth_min, self.slider_azimuth_min, self.lcd_azimuth_min]))
+        #self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_azimuth_max, self.slider_azimuth_max, self.lcd_azimuth_max]))
+        
+        self.GBox_Azimuth = QGroupBox(self, title="Azimuth")
+        self.Vbox_Azimuth = QtWidgets.QVBoxLayout()
+        self.GBox_Azimuth.setLayout(self.Vbox_Azimuth)
+        self.Vbox_Azimuth.addLayout(HBoxLayoutHelper([self.label_azimuth_min, self.slider_azimuth_min, self.lcd_azimuth_min]))
+        self.Vbox_Azimuth.addLayout(HBoxLayoutHelper([self.label_azimuth_max, self.slider_azimuth_max, self.lcd_azimuth_max]))
+        self.vertical_layout_two.addWidget(self.GBox_Azimuth)
+
+
+        self.GBox_Elevation = QGroupBox(self, title="Elevation")
+        self.Vbox_Elevation = QtWidgets.QVBoxLayout()
+        self.GBox_Elevation.setLayout(self.Vbox_Elevation)
+        self.Vbox_Elevation.addLayout(HBoxLayoutHelper([self.label_elevation_min, self.slider_elevation_min, self.lcd_elevation_min]))
+        self.Vbox_Elevation.addLayout(HBoxLayoutHelper([self.label_elevation_max, self.slider_elevation_max, self.lcd_elevation_max]))
+        self.vertical_layout_two.addWidget(self.GBox_Elevation)
+              
+        
+        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_elevation_min, self.slider_elevation_min, self.lcd_elevation_min]))
+        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_elevation_max, self.slider_elevation_max, self.lcd_elevation_max]))
+        
+        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_step_change, self.slider_step_change, self.lcd_step_change]))
+        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_scan_frequency, self.slider_scan_frequency, self.lcd_scan_frequency]))
+        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_samples_orientation, self.slider_samples_orientation, self.lcd_samples_orientation]))
+        
+        
         self.setWindowTitle("Graph Console")
+        
     """ Azimuth Max Slider
       @param self The object pointer."""
     def azimuth_max_change(self):
