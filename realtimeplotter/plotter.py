@@ -1,41 +1,34 @@
 """ @module 
 plotter
 """
-from qtpy.QtCore import QLocale, QObject, QSize, Qt, QTimer
-from qtpy.QtGui import QColor, QColorConstants, QFont, QVector3D, qRgb, QPalette
-from qtpy.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QComboBox,
-    QDialog,
-    QFontComboBox,
-    QFrame,
-    QHBoxLayout,
-    QLabel,
-    QLCDNumber,
-    QMainWindow,
-    QPushButton,
-    QSizePolicy,
-    QSlider,
-    QVBoxLayout,
-    QWidget,
-    QStyleFactory,
-    QStyle,
-)
-from qtpy.QtDatavisualization import (
+from PyQt5.QtDataVisualization import (
     Q3DCamera,
-    Q3DScatter,
+    # Q3DScatter,
     Q3DTheme,
-    QAbstract3DAxis,
+    # QAbstract3DAxis,
     QAbstract3DGraph,
     QAbstract3DSeries,
     QCustom3DItem,
     QScatter3DSeries,
-    QScatterDataItem,
+    # QScatterDataItem,
     QScatterDataProxy,
     QValue3DAxis,
-    QValue3DAxisFormatter,
+    QValue3DAxisFormatter
 )
+from PyQt5.QtCore import (
+    QTimer,
+    QObject
+)
+from PyQt5.QtGui import (
+    QColor,
+    QColorConstants, 
+    QFont, 
+    QVector3D
+)
+
+
+
+
 
 """ This class handles the entire plotting infrastructure. 
   The class is instantiated within another window and can take in data to be plotted.
@@ -46,7 +39,7 @@ def CreateAxis(
     axis_proxy, axis_title, axis_title_visible, axis_segs, axis_subsegs
 ) -> QValue3DAxis:
     axis = QValue3DAxis(axis_proxy)
-    axis.setLabelFormat("%.2f mm")
+    axis.setLabelFormat("%d mm")
     axis.setSegmentCount(axis_segs)
     axis.setSubSegmentCount(axis_subsegs)
     axis.setTitle(axis_title)
@@ -58,7 +51,7 @@ class Plotter(QObject):
     def __init__(self, scatter):
         super(Plotter, self).__init__()
         self.graph = scatter  # graph instance passed in as arument
-        self.m_fontSize = 12
+        self.m_fontSize = 16
         self.m_style = QAbstract3DSeries.MeshSphere
         self.m_smooth = True
         self.plot_timer = QTimer()
@@ -66,22 +59,26 @@ class Plotter(QObject):
         """ Graph Theme """
         customTheme = self.graph.activeTheme()
         customTheme.setAmbientLightStrength(0.3)
-        customTheme.setBackgroundColor(QColor(QColorConstants.White))
-        customTheme.setBackgroundEnabled(False)
+        customTheme.setBackgroundColor(QColor(QColorConstants.Black))
+        customTheme.setBackgroundEnabled(True)
         customTheme.setBaseColors(
-            [QColorConstants.Red, QColorConstants.DarkRed, QColorConstants.Magenta]
+            [
+                QColorConstants.Red, 
+                QColorConstants.DarkRed, 
+                QColorConstants.Magenta
+            ]
         )
         customTheme.setColorStyle(Q3DTheme.ColorStyleUniform)
-        customTheme.setFont(QFont("Arial"))
+        customTheme.setFont(QFont("Segoe UI"))
         customTheme.setGridEnabled(True)
-        customTheme.setGridLineColor(QColor(QColorConstants.White))
+        customTheme.setGridLineColor(QColor(QColorConstants.Red))
         customTheme.setHighlightLightStrength(7.0)
 
         # labels
         customTheme.setLabelBackgroundColor(QColor(QColorConstants.Black))
         customTheme.setLabelBackgroundEnabled(True)
-        customTheme.setLabelBorderEnabled(True)
-        customTheme.setLabelTextColor(QColor(QColorConstants.Red))
+        customTheme.setLabelBorderEnabled(False)
+        customTheme.setLabelTextColor(QColor(QColorConstants.White))
 
         # light
         customTheme.setLightColor(QColor(QColorConstants.White))
@@ -91,12 +88,12 @@ class Plotter(QObject):
 
         # window
         # customTheme.setWindowColor(QColor(QColorConstants.Black))
-        customTheme.setWindowColor(QColor(QColorConstants.White))
+        customTheme.setWindowColor(QColor(53, 53, 53))
         self.graph.activeTheme().setType(Q3DTheme.ThemeUserDefined)
 
         """ font """
         font = self.graph.activeTheme().font()
-        font.setPointSize(12.0)
+        font.setPointSize(24.0)
         self.graph.activeTheme().setFont(QFont("Segoe UI"))
 
         """ shadow quality """
@@ -151,11 +148,8 @@ class Plotter(QObject):
       @param self The object pointer"""
 
     def addCustomItem(self, point):
-        print("[addCustomItem]")
-        print(point)
         new_item = QCustom3DItem()
         new_item.setMeshFile("C:\\dev\\github\\python-gui-real-time-plotting\\realtimeplotter\\sphere.obj")
-        # new_item.setScaling(QVector3D(0.005, 0.005, 0.005))
         new_item.setScaling(QVector3D(0.005, 0.005, 0.005))
         new_item.setPosition(point)
         self.graph.addCustomItem(new_item)

@@ -3,51 +3,25 @@
   The classes dont take any input and run off of each other. Button input triggers the 
  instance of one of these classes as every class generates a new window, except the plotting 
 """
-import collections, math, struct, sys, time, copy, serial
+import sys
 import numpy as np
-from threading import Thread
 from PyQt5 import QtSerialPort
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from qtpy.uic import loadUi
-from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtCore import QLocale, QObject, QSize, Qt, QTimer
-from qtpy.QtGui import QColor, QColorConstants, QFont, QVector3D, qRgb, QPalette
-from qtpy.QtWidgets import (
+from PyQt5.QtCore import (
+    pyqtSlot, 
+    QTimer, 
+    QIODevice
+)
+from PyQt5.QtWidgets import (
     QApplication,
-    QCheckBox,
-    QComboBox,
-    QDialog,
-    QFontComboBox,
-    QFrame,
-    QHBoxLayout,
-    QLabel,
-    QLCDNumber,
-    QMainWindow,
-    QPushButton,
-    QSizePolicy,
-    QSlider,
-    QVBoxLayout,
     QWidget,
-    QStyleFactory,
-    QStyle,
+    QLineEdit,
+    QTextEdit,
+    QPushButton,
+    QVBoxLayout,
+    QHBoxLayout
 )
-from qtpy.QtDatavisualization import (
-    Q3DCamera,
-    Q3DScatter,
-    Q3DTheme,
-    QAbstract3DAxis,
-    QAbstract3DGraph,
-    QAbstract3DSeries,
-    QCustom3DItem,
-    QScatter3DSeries,
-    QScatterDataItem,
-    QScatterDataProxy,
-    QValue3DAxis,
-    QValue3DAxisFormatter,
-)
-
-
 from helpers import GenericLayoutHelper
+from theme import ApplicationTheme
 
 
 """ RangeFinder Class
@@ -61,7 +35,7 @@ from helpers import GenericLayoutHelper
 """
 
 
-class RealTimeSender(QtWidgets.QWidget):
+class RealTimeSender(QWidget):
     """The constructor."""
 
     def __init__(self, parent=None):
@@ -70,35 +44,35 @@ class RealTimeSender(QtWidgets.QWidget):
         """
         Text and Line Edits
         """        
-        self.lineedit_message = QtWidgets.QLineEdit()
+        self.lineedit_message = QLineEdit()
         self.lineedit_message.setFixedSize(120, 50)
         
-        self.textedit_output = QtWidgets.QTextEdit(readOnly=True)
+        self.textedit_output = QTextEdit(readOnly=True)
         self.textedit_output.setFixedWidth(500)
     
     
         """ Timers (ms) """
-        self.timer = QtCore.QTimer(self)
+        self.timer = QTimer(self)
         self.timer.setInterval(100)
         self.timer.start()
         self.timer.timeout.connect(self.receive)
 
         """ Buttons """
-        self.button_send = QtWidgets.QPushButton(text="Send to Board", clicked=self.send)
+        self.button_send = QPushButton(text="Send to Board", clicked=self.send)
         self.button_send.setFixedSize(120, 50)
 
-        self.button_connect = QtWidgets.QPushButton(
+        self.button_connect = QPushButton(
             text="Connect", checkable=True, toggled=self.on_toggled
         )
         self.button_connect.setStyleSheet("background-color: red")
         self.button_connect.setFixedSize(120, 50)
 
         """ Layout """
-        VBox = QtWidgets.QVBoxLayout(self)
+        VBox = QVBoxLayout(self)
         
-        vbox_layout_one = QtWidgets.QVBoxLayout()
+        vbox_layout_one = QVBoxLayout()
         vbox_layout_one = GenericLayoutHelper(
-            QtWidgets.QVBoxLayout(), 
+            QVBoxLayout(), 
             [
                 self.lineedit_message,
                 self.button_send,
@@ -106,10 +80,10 @@ class RealTimeSender(QtWidgets.QWidget):
             ]
         )
         
-        hbox_layout_one = QtWidgets.QHBoxLayout()
+        hbox_layout_one = QHBoxLayout()
         hbox_layout_one.addLayout(vbox_layout_one)
         
-        hbox_layout_two = QtWidgets.QHBoxLayout()
+        hbox_layout_two = QHBoxLayout()
         hbox_layout_two.addWidget(self.textedit_output, 1)
         
         VBox.addLayout(hbox_layout_one)
@@ -142,17 +116,6 @@ class RealTimeSender(QtWidgets.QWidget):
             raw_input_data = self.serial.readLine().data().decode()
             self.textedit_output.append(f"[Received] {raw_input_data}")
             print(f"[Received] {raw_input_data}")
-            
-            
-            #raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
-            #theta = math.radians(raw_input_data[1])
-            #phi = math.radians(raw_input_data[0])
-            #distance = raw_input_data[2]
-            #x_val = distance * math.sin(theta) * math.cos(phi)
-            #y_val = distance * math.sin(theta) * math.sin(phi)
-            #z_val = distance * math.cos(theta)
-            #self.textedit_output.append(f"x = {x_val} y = {y_val} z = {z_val}")
-            #self.plotbank.append(f"x = {x_val} y = {y_val} z = {z_val}")
 
     """ Method to send commands via serial
     #  @param self The object pointer"""
@@ -160,15 +123,13 @@ class RealTimeSender(QtWidgets.QWidget):
     @pyqtSlot()
     def send(self):
         # command = f'[Sent] {self.lineedit_message.text()}\r'
-        phi = self.rng.integers(low=-1500, high=1500)
-        dist = self.rng.integers(low=-1500, high=1500)
-        theta = self.rng.integers(low=-1500, high=1500)
+        x_point = self.rng.integers(low=-1500, high=1500)
+        y_point = self.rng.integers(low=-1500, high=1500)
+        z_point = self.rng.integers(low=0, high=3000)
+        command = f'{x_point},{y_point},{z_point}\r\n'
         
-        command = f'{phi},{dist},{theta}\r\n'
         self.serial.write(command.encode())
         self.textedit_output.append(f"[Sent] {command.encode()}")
-        # self.serial.waitForBytesWritten(1000)
-        
 
     """ Method to create a serial connection with the board
     #  @param self The object pointer"""
@@ -183,15 +144,11 @@ class RealTimeSender(QtWidgets.QWidget):
         )
         if checked:
             if not self.serial.isOpen():
-                if not self.serial.open(QtCore.QIODevice.ReadWrite):
+                if not self.serial.open(QIODevice.ReadWrite):
                     self.button_connect.setChecked(False)
         else:
             self.serial.close()
 
-
-import sys
-from PyQt5.QtWidgets import QApplication
-from theme import ApplicationTheme
 
 
 if __name__ == "__main__":
