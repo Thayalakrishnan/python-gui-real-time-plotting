@@ -9,22 +9,22 @@ from realtimeplotter.real_time_plotter_widget import RealTimePlotterWidget
 from realtimeplotter.theme import ApplicationTheme
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setStyle('Fusion')
+    app.setStyle("Fusion")
     app.setPalette(ApplicationTheme())
-    
+
     w = RealTimePlotterWidget()
-    
-    ''' 
+
+    """ 
     Initialise the Sliders 
-    '''
+    """
     w.button_quick_scan.clicked.connect(w.button_quick_scan_click)
     w.button_deep_scan.clicked.connect(w.button_deep_scan_click)
     w.button_custom_scan.clicked.connect(w.button_custom_scan_click)
     w.button_calibrate.clicked.connect(w.button_calibrate_click)
     w.button_ptu_control.clicked.connect(w.button_ptu_control_click)
     w.button_help.clicked.connect(w.button_help_click)
-    
+
     w.show()
     sys.exit(app.exec_())

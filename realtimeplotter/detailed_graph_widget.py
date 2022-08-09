@@ -12,16 +12,39 @@ from qtpy.uic import loadUi
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QLocale, QObject, QSize, Qt, QTimer
 from qtpy.QtGui import QColor, QColorConstants, QFont, QVector3D, qRgb, QPalette
-from qtpy.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, 
-                            QFontComboBox, QFrame, QHBoxLayout, QLabel, 
-                            QLCDNumber, QMainWindow, QPushButton, 
-                            QSizePolicy, QSlider, QVBoxLayout, QWidget, QStyleFactory, QStyle)
-from qtpy.QtDatavisualization import (Q3DCamera, Q3DScatter, Q3DTheme,
-                                      QAbstract3DAxis, QAbstract3DGraph,
-                                      QAbstract3DSeries, QCustom3DItem,
-                                      QScatter3DSeries, QScatterDataItem,
-                                      QScatterDataProxy, QValue3DAxis,
-                                      QValue3DAxisFormatter)
+from qtpy.QtWidgets import (
+    QApplication,
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QFontComboBox,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLCDNumber,
+    QMainWindow,
+    QPushButton,
+    QSizePolicy,
+    QSlider,
+    QVBoxLayout,
+    QWidget,
+    QStyleFactory,
+    QStyle,
+)
+from qtpy.QtDatavisualization import (
+    Q3DCamera,
+    Q3DScatter,
+    Q3DTheme,
+    QAbstract3DAxis,
+    QAbstract3DGraph,
+    QAbstract3DSeries,
+    QCustom3DItem,
+    QScatter3DSeries,
+    QScatterDataItem,
+    QScatterDataProxy,
+    QValue3DAxis,
+    QValue3DAxisFormatter,
+)
 
 
 from realtimeplotter.plotter import Plotter
@@ -29,13 +52,16 @@ from realtimeplotter.plotter import Plotter
 from realtimeplotter.helpers import HBoxLayoutHelper, LCDWidgetHelper, LabelWidgetHelper
 
 
-def CreateLCD(lcd_object_name, lcd_has_decimal_point, lcd_size_width, lcd_size_height) -> QtWidgets.QLCDNumber:
-    lcd  = QtWidgets.QLCDNumber()
+def CreateLCD(
+    lcd_object_name, lcd_has_decimal_point, lcd_size_width, lcd_size_height
+) -> QtWidgets.QLCDNumber:
+    lcd = QtWidgets.QLCDNumber()
     lcd.setFrameShape(QtWidgets.QFrame.NoFrame)
     lcd.setSmallDecimalPoint(lcd_has_decimal_point)
     lcd.setObjectName(lcd_object_name)
     lcd.setFixedSize(lcd_size_width, lcd_size_height)
     return lcd
+
 
 def CreateLabel(label_text, label_size_width, label_size_height) -> QtWidgets.QLabel:
     label = QtWidgets.QLabel()
@@ -45,15 +71,12 @@ def CreateLabel(label_text, label_size_width, label_size_height) -> QtWidgets.QL
     label.setText(label_text)
     return label
 
+
 def CreateLCDLabelHBox(lcd_widget, label_widget) -> QtWidgets.QLabel:
     h_lay = QtWidgets.QHBoxLayout()
     h_lay.addWidget(lcd_widget)
     h_lay.addWidget(label_widget)
     return h_lay
-
-
-
-
 
 
 """ DetailedGraphWidget
@@ -64,24 +87,26 @@ def CreateLCDLabelHBox(lcd_widget, label_widget) -> QtWidgets.QLabel:
     
     This Class subclasses the QtWidgets to create an instance 
 """
-''' Generate the Graphing Console '''
+""" Generate the Graphing Console """
+
+
 class DetailedGraphWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(DetailedGraphWidget, self).__init__(parent)
-        ''' Widgets '''
+        """ Widgets """
         self.run_scan = QtWidgets.QPushButton(text="Run Scan")
-        self.run_scan.setFixedSize(120,50)
+        self.run_scan.setFixedSize(120, 50)
         self.stop_scan = QtWidgets.QPushButton(text="Stop Scan")
-        self.stop_scan.setFixedSize(120,50)
-                
+        self.stop_scan.setFixedSize(120, 50)
+
         self.lcd_acc = LCDWidgetHelper("lcd_acc", False, 120, 50)
         self.lcd_gyr = LCDWidgetHelper("lcd_gyr", False, 120, 50)
         self.lcd_mag = LCDWidgetHelper("lcd_mag", False, 120, 50)
         self.lcd_azi = LCDWidgetHelper("lcd_azi", False, 120, 50)
         self.lcd_ele = LCDWidgetHelper("lcd_ele", False, 120, 50)
         self.lcd_dis = LCDWidgetHelper("lcd_dis", False, 120, 50)
-        
-        ''' Graphing '''
+
+        """ Graphing """
         graph = Q3DScatter()
         screenSize = graph.screen().size()
         self.graph_container = QtWidgets.QWidget.createWindowContainer(graph)
@@ -90,8 +115,8 @@ class DetailedGraphWidget(QtWidgets.QWidget):
         self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.graph_container.setFocusPolicy(Qt.StrongFocus)
         self.modified_graph = Plotter(graph)
-        
-        ''' Labels '''       
+
+        """ Labels """
         self.label_acc = LabelWidgetHelper("Accelerometer", 120, 50)
         self.label_gyr = LabelWidgetHelper("Gyroscope", 120, 50)
         self.label_mag = LabelWidgetHelper("Magnetometer", 120, 50)
@@ -99,20 +124,32 @@ class DetailedGraphWidget(QtWidgets.QWidget):
         self.label_ele = LabelWidgetHelper("Elevation", 120, 50)
         self.label_dis = LabelWidgetHelper("Distance", 120, 50)
 
-
-        ''' Layout '''
+        """ Layout """
         self.vertical_layout = QtWidgets.QVBoxLayout(self)
         self.vertical_layout.addWidget(self.graph_container, 1)
-        
+
         self.vertical_layout_two = QtWidgets.QVBoxLayout()
         self.vertical_layout.addLayout(self.vertical_layout_two, 2)
-        
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.run_scan, self.stop_scan]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_acc, self.lcd_acc]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_gyr, self.lcd_gyr]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_mag, self.lcd_mag]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_azi, self.lcd_azi]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_ele, self.lcd_ele]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_dis, self.lcd_dis]))
-        self.setWindowTitle("Graph Console")
 
+        self.vertical_layout_two.addLayout(
+            HBoxLayoutHelper([self.run_scan, self.stop_scan])
+        )
+        self.vertical_layout_two.addLayout(
+            HBoxLayoutHelper([self.label_acc, self.lcd_acc])
+        )
+        self.vertical_layout_two.addLayout(
+            HBoxLayoutHelper([self.label_gyr, self.lcd_gyr])
+        )
+        self.vertical_layout_two.addLayout(
+            HBoxLayoutHelper([self.label_mag, self.lcd_mag])
+        )
+        self.vertical_layout_two.addLayout(
+            HBoxLayoutHelper([self.label_azi, self.lcd_azi])
+        )
+        self.vertical_layout_two.addLayout(
+            HBoxLayoutHelper([self.label_ele, self.lcd_ele])
+        )
+        self.vertical_layout_two.addLayout(
+            HBoxLayoutHelper([self.label_dis, self.lcd_dis])
+        )
+        self.setWindowTitle("Graph Console")
