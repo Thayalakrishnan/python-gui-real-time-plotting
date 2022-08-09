@@ -48,7 +48,7 @@ class Plotter(QObject):
         """ Graph Theme """
         customTheme = self.graph.activeTheme()
         customTheme.setAmbientLightStrength(0.3)
-        customTheme.setBackgroundColor(QColor(QColorConstants.Black))
+        customTheme.setBackgroundColor(QColor(42, 42, 42))
         customTheme.setBackgroundEnabled(True)
         customTheme.setBaseColors(
             [QColorConstants.Red, QColorConstants.DarkRed, QColorConstants.Magenta]
@@ -60,7 +60,7 @@ class Plotter(QObject):
         customTheme.setHighlightLightStrength(7.0)
 
         # labels
-        customTheme.setLabelBackgroundColor(QColor(QColorConstants.Black))
+        customTheme.setLabelBackgroundColor(QColor(42, 42, 42))
         customTheme.setLabelBackgroundEnabled(True)
         customTheme.setLabelBorderEnabled(False)
         customTheme.setLabelTextColor(QColor(QColorConstants.White))
@@ -73,7 +73,7 @@ class Plotter(QObject):
 
         # window
         # customTheme.setWindowColor(QColor(QColorConstants.Black))
-        customTheme.setWindowColor(QColor(53, 53, 53))
+        customTheme.setWindowColor(QColor(42, 42, 42))
         self.graph.activeTheme().setType(Q3DTheme.ThemeUserDefined)
 
         """ font """

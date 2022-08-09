@@ -15,8 +15,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from PyQt5.QtDatavisualization import Q3DScatter
 
+from PyQt5.QtDataVisualization import Q3DScatter
 
 from realtimeplotter.plotter import Plotter
 

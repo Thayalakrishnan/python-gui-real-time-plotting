@@ -6,7 +6,6 @@
 from PyQt5 import QtSerialPort
 from PyQt5.QtCore import pyqtSlot, QSize, Qt, QTimer, QIODevice
 from PyQt5.QtWidgets import (
-    QApplication,
     QWidget,
     QLineEdit,
     QTextEdit,
@@ -21,7 +20,6 @@ from realtimeplotter.plotter import Plotter
 from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
 from realtimeplotter.custom_scan_widget import CustomScanWidget
 from realtimeplotter.helpers import GenericLayoutHelper
-
 
 """ 
 RangeFinder Class
@@ -66,7 +64,7 @@ class RealTimePlotterWidget(QWidget):
         screenSize = graph.screen().size()
         self.graph_container = QWidget.createWindowContainer(graph)
         self.graph_container.setMinimumSize(QSize(500, 500))
-        self.graph_container.setMaximumSize(screenSize)
+        # self.graph_container.setMaximumSize(screenSize)
         self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.graph_container.setFocusPolicy(Qt.StrongFocus)
         self.graph_modifed = Plotter(graph)
