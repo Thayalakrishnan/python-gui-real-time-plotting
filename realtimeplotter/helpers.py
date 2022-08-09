@@ -40,7 +40,7 @@ def HBoxLayoutHelper(arr_widgets) -> QHBoxLayout:
     return h_lay
 
 
-def LayoutHelper(layout_box, arr_widgets):
+def GenericLayoutHelper(layout_box, arr_widgets):
     for w in arr_widgets:
         layout_box.addWidget(w)
     return layout_box
