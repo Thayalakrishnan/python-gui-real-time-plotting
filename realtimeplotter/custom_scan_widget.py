@@ -139,29 +139,44 @@ class CustomScanWidget(QtWidgets.QWidget):
         ''' Add Widget '''
         #self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_azimuth_min, self.slider_azimuth_min, self.lcd_azimuth_min]))
         #self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_azimuth_max, self.slider_azimuth_max, self.lcd_azimuth_max]))
+        #self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_elevation_min, self.slider_elevation_min, self.lcd_elevation_min]))
+        #self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_elevation_max, self.slider_elevation_max, self.lcd_elevation_max]))
+        
         
         self.GBox_Azimuth = QGroupBox(self, title="Azimuth")
         self.Vbox_Azimuth = QtWidgets.QVBoxLayout()
         self.GBox_Azimuth.setLayout(self.Vbox_Azimuth)
         self.Vbox_Azimuth.addLayout(HBoxLayoutHelper([self.label_azimuth_min, self.slider_azimuth_min, self.lcd_azimuth_min]))
         self.Vbox_Azimuth.addLayout(HBoxLayoutHelper([self.label_azimuth_max, self.slider_azimuth_max, self.lcd_azimuth_max]))
-        self.vertical_layout_two.addWidget(self.GBox_Azimuth)
-
 
         self.GBox_Elevation = QGroupBox(self, title="Elevation")
         self.Vbox_Elevation = QtWidgets.QVBoxLayout()
         self.GBox_Elevation.setLayout(self.Vbox_Elevation)
         self.Vbox_Elevation.addLayout(HBoxLayoutHelper([self.label_elevation_min, self.slider_elevation_min, self.lcd_elevation_min]))
         self.Vbox_Elevation.addLayout(HBoxLayoutHelper([self.label_elevation_max, self.slider_elevation_max, self.lcd_elevation_max]))
+
+        self.GBox_StepChange = QGroupBox(self, title="Step Change")
+        self.Vbox_StepChange = QtWidgets.QVBoxLayout()        
+        self.GBox_StepChange.setLayout(self.Vbox_StepChange)
+        self.Vbox_StepChange.addLayout(HBoxLayoutHelper([self.label_step_change, self.slider_step_change, self.lcd_step_change]))
+        
+        self.GBox_ScanFrequency = QGroupBox(self, title="Scan Frequency")
+        self.Vbox_ScanFrequency = QtWidgets.QVBoxLayout()        
+        self.GBox_ScanFrequency.setLayout(self.Vbox_ScanFrequency)
+        self.Vbox_ScanFrequency.addLayout(HBoxLayoutHelper([self.label_scan_frequency, self.slider_scan_frequency, self.lcd_scan_frequency]))
+        
+        self.GBox_SamplesPerOrientaiton = QGroupBox(self, title="Samples Per Orientaiton")
+        self.Vbox_SamplesPerOrientaiton = QtWidgets.QVBoxLayout()        
+        self.GBox_SamplesPerOrientaiton.setLayout(self.Vbox_SamplesPerOrientaiton)
+        self.Vbox_SamplesPerOrientaiton.addLayout(HBoxLayoutHelper([self.label_samples_orientation, self.slider_samples_orientation, self.lcd_samples_orientation]))
+        
+        
+        
+        self.vertical_layout_two.addWidget(self.GBox_Azimuth)
         self.vertical_layout_two.addWidget(self.GBox_Elevation)
-              
-        
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_elevation_min, self.slider_elevation_min, self.lcd_elevation_min]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_elevation_max, self.slider_elevation_max, self.lcd_elevation_max]))
-        
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_step_change, self.slider_step_change, self.lcd_step_change]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_scan_frequency, self.slider_scan_frequency, self.lcd_scan_frequency]))
-        self.vertical_layout_two.addLayout(HBoxLayoutHelper([self.label_samples_orientation, self.slider_samples_orientation, self.lcd_samples_orientation]))
+        self.vertical_layout_two.addWidget(self.GBox_StepChange)
+        self.vertical_layout_two.addWidget(self.GBox_ScanFrequency)
+        self.vertical_layout_two.addWidget(self.GBox_SamplesPerOrientaiton)
         
         
         self.setWindowTitle("Graph Console")
