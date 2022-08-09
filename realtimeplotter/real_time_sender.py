@@ -1,7 +1,6 @@
-""" @package RangeFinder
-  This package contains all the classes that are used to create an instance of the GUI
-  The classes dont take any input and run off of each other. Button input triggers the 
- instance of one of these classes as every class generates a new window, except the plotting 
+"""
+RealTimeSender
+This package contains the RealTimeSender class used for simulating and testing the serial connection
 """
 import sys
 import numpy as np
