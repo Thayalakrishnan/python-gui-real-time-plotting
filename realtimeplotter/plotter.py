@@ -97,7 +97,7 @@ class Plotter(QObject):
         """ font """
         font = self.graph.activeTheme().font()
         font.setPointSize(12.0)
-        self.graph.activeTheme().setFont(QFont("Arial"))
+        self.graph.activeTheme().setFont(QFont("Segoe UI"))
 
         """ shadow quality """
         self.graph.setShadowQuality(QAbstract3DGraph.ShadowQualitySoftLow)
