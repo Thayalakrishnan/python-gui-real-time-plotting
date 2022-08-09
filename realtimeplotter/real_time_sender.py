@@ -6,11 +6,7 @@
 import sys
 import numpy as np
 from PyQt5 import QtSerialPort
-from PyQt5.QtCore import (
-    pyqtSlot, 
-    QTimer, 
-    QIODevice
-)
+from PyQt5.QtCore import pyqtSlot, QTimer, QIODevice
 from PyQt5.QtWidgets import (
     QApplication,
     QWidget,
@@ -18,7 +14,7 @@ from PyQt5.QtWidgets import (
     QTextEdit,
     QPushButton,
     QVBoxLayout,
-    QHBoxLayout
+    QHBoxLayout,
 )
 from helpers import GenericLayoutHelper
 from theme import ApplicationTheme
@@ -43,14 +39,13 @@ class RealTimeSender(QWidget):
 
         """
         Text and Line Edits
-        """        
+        """
         self.lineedit_message = QLineEdit()
         self.lineedit_message.setFixedSize(120, 50)
-        
+
         self.textedit_output = QTextEdit(readOnly=True)
         self.textedit_output.setFixedWidth(500)
-    
-    
+
         """ Timers (ms) """
         self.timer = QTimer(self)
         self.timer.setInterval(100)
@@ -69,29 +64,28 @@ class RealTimeSender(QWidget):
 
         """ Layout """
         VBox = QVBoxLayout(self)
-        
+
         vbox_layout_one = QVBoxLayout()
         vbox_layout_one = GenericLayoutHelper(
-            QVBoxLayout(), 
+            QVBoxLayout(),
             [
                 self.lineedit_message,
                 self.button_send,
                 self.button_connect,
-            ]
+            ],
         )
-        
+
         hbox_layout_one = QHBoxLayout()
         hbox_layout_one.addLayout(vbox_layout_one)
-        
+
         hbox_layout_two = QHBoxLayout()
         hbox_layout_two.addWidget(self.textedit_output, 1)
-        
+
         VBox.addLayout(hbox_layout_one)
         VBox.addLayout(hbox_layout_two)
-        
 
         self.setWindowTitle("Range Finder")
-        
+
         """ commands """
         self.command_d = "d"
         self.command_h = "h"
@@ -100,10 +94,9 @@ class RealTimeSender(QWidget):
 
         """ Serial Connection configuration """
         self.serial = QtSerialPort.QSerialPort(
-            "COM6", 
-            baudRate=QtSerialPort.QSerialPort.Baud9600, 
+            "COM6",
+            baudRate=QtSerialPort.QSerialPort.Baud9600,
             readyRead=self.receive,
-            
         )
         self.rng = np.random.default_rng(12345)
         self.serial.open(self.serial.ReadWrite)
@@ -126,8 +119,8 @@ class RealTimeSender(QWidget):
         x_point = self.rng.integers(low=-1500, high=1500)
         y_point = self.rng.integers(low=-1500, high=1500)
         z_point = self.rng.integers(low=0, high=3000)
-        command = f'{x_point},{y_point},{z_point}\r\n'
-        
+        command = f"{x_point},{y_point},{z_point}\r\n"
+
         self.serial.write(command.encode())
         self.textedit_output.append(f"[Sent] {command.encode()}")
 
@@ -137,7 +130,7 @@ class RealTimeSender(QWidget):
     @pyqtSlot(bool)
     def on_toggled(self, checked):
         self.textedit_output.append(f"{'Connected' if checked else 'Disconnected'}")
-        
+
         self.button_connect.setText("Disconnect" if checked else "Connect")
         self.button_connect.setStyleSheet(
             "background-color: green" if checked else "background-color: red"
@@ -148,7 +141,6 @@ class RealTimeSender(QWidget):
                     self.button_connect.setChecked(False)
         else:
             self.serial.close()
-
 
 
 if __name__ == "__main__":

@@ -4,13 +4,7 @@
  instance of one of these classes as every class generates a new window, except the plotting 
 """
 from PyQt5 import QtSerialPort
-from PyQt5.QtCore import (
-    pyqtSlot, 
-    QSize, 
-    Qt, 
-    QTimer, 
-    QIODevice
-)
+from PyQt5.QtCore import pyqtSlot, QSize, Qt, QTimer, QIODevice
 from PyQt5.QtWidgets import (
     QApplication,
     QWidget,
@@ -19,14 +13,10 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QHBoxLayout,
-    QSizePolicy
+    QSizePolicy,
 )
-from PyQt5.QtDataVisualization import (
-    Q3DScatter
-)
-from PyQt5.QtGui import (
-    QVector3D
-)
+from PyQt5.QtDataVisualization import Q3DScatter
+from PyQt5.QtGui import QVector3D
 from realtimeplotter.plotter import Plotter
 from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
 from realtimeplotter.custom_scan_widget import CustomScanWidget
@@ -54,13 +44,13 @@ class RealTimePlotterWidget(QWidget):
         super(RealTimePlotterWidget, self).__init__(parent)
         """
         Text and Line Edits
-        """        
+        """
         self.lineedit_message = QLineEdit()
         self.lineedit_message.setFixedSize(120, 50)
-        
+
         self.textedit_output = QTextEdit(readOnly=True)
-        #self.textedit_output.setFixedWidth(500)        
-        
+        # self.textedit_output.setFixedWidth(500)
+
         """
         Timers (ms) 
         """
@@ -68,7 +58,7 @@ class RealTimePlotterWidget(QWidget):
         self.timer.setInterval(100)
         self.timer.start()
         self.timer.timeout.connect(self.receive)
-        
+
         """
         Graphing 
         """
@@ -96,35 +86,35 @@ class RealTimePlotterWidget(QWidget):
         self.button_quick_scan = QPushButton()
         self.button_quick_scan.setFixedSize(120, 50)
         self.button_quick_scan.setText("Quick Scan")
-        
+
         self.button_deep_scan = QPushButton()
         self.button_deep_scan.setFixedSize(120, 50)
         self.button_deep_scan.setText("Deep Scan")
-        
+
         self.button_custom_scan = QPushButton()
         self.button_custom_scan.setFixedSize(120, 50)
         self.button_custom_scan.setText("Custom Scan")
-        
+
         self.button_calibrate = QPushButton()
         self.button_calibrate.setFixedSize(120, 50)
         self.button_calibrate.setText("Calibrate")
-        
+
         self.button_ptu_control = QPushButton()
         self.button_ptu_control.setFixedSize(120, 50)
         self.button_ptu_control.setText("PTU Control")
-        
+
         self.button_help = QPushButton()
         self.button_help.setFixedSize(120, 50)
         self.button_help.setText("Help!?")
-        
+
         """
         Layout 
         """
         VBox = QVBoxLayout(self)
-        
+
         vbox_layout_one = QVBoxLayout()
         vbox_layout_one = GenericLayoutHelper(
-            QVBoxLayout(), 
+            QVBoxLayout(),
             [
                 self.lineedit_message,
                 self.button_send,
@@ -134,32 +124,30 @@ class RealTimePlotterWidget(QWidget):
                 self.button_custom_scan,
                 self.button_calibrate,
                 self.button_ptu_control,
-                self.button_help
-            ]
+                self.button_help,
+            ],
         )
-        
+
         hbox_layout_one = QHBoxLayout()
         hbox_layout_one.addWidget(self.graph_container)
         hbox_layout_one.addLayout(vbox_layout_one)
-        
+
         hbox_layout_two = QHBoxLayout()
         hbox_layout_two.addWidget(self.textedit_output, 1)
-        
+
         VBox.addLayout(hbox_layout_one)
         VBox.addLayout(hbox_layout_two)
-        
+
         """
         Serial Connection configuration 
         """
         self.serial = QtSerialPort.QSerialPort(
-            "COM5", 
-            baudRate=QtSerialPort.QSerialPort.Baud9600, 
-            readyRead=self.receive
+            "COM5", baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive
         )
-        
+
         self.serial.open(self.serial.ReadWrite)
         self.setWindowTitle("Range Finder")
-        
+
         """
         commands 
         """
@@ -183,12 +171,12 @@ class RealTimePlotterWidget(QWidget):
         while self.serial.canReadLine():
             raw_input_data = self.serial.readLine().data().decode()
             raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
-            #phi = math.radians(raw_input_data[0])
-            #theta = math.radians(raw_input_data[1])
-            #distance = raw_input_data[2]
-            #x_val = distance * math.sin(theta) * math.cos(phi)
-            #y_val = distance * math.sin(theta) * math.sin(phi)
-            #z_val = distance * math.cos(theta)
+            # phi = math.radians(raw_input_data[0])
+            # theta = math.radians(raw_input_data[1])
+            # distance = raw_input_data[2]
+            # x_val = distance * math.sin(theta) * math.cos(phi)
+            # y_val = distance * math.sin(theta) * math.sin(phi)
+            # z_val = distance * math.cos(theta)
             x_val = raw_input_data[0]
             y_val = raw_input_data[1]
             z_val = raw_input_data[2]
@@ -204,12 +192,11 @@ class RealTimePlotterWidget(QWidget):
 
     @pyqtSlot()
     def send(self):
-        #self.serial.write(self.lineedit_message.text().encode())
+        # self.serial.write(self.lineedit_message.text().encode())
         command = f'{"hello"}\r\n'
         self.serial.write(command.encode())
         self.textedit_output.append(f"[Sent] {command}")
         # self.serial.waitForBytesWritten(1000)
-        
 
     """ 
     # Method to create a serial connection with the board
@@ -261,9 +248,10 @@ class RealTimePlotterWidget(QWidget):
     # Button to trigger a custom scan
     # @param self The object pointer
     # """
+
     def button_custom_scan_click(self):
         self.custom_scan = CustomScanWidget()
-        
+
         self.custom_scan.slider_azimuth_max.valueChanged.connect(
             self.custom_scan.azimuth_max_change
         )
@@ -291,7 +279,7 @@ class RealTimePlotterWidget(QWidget):
         self.custom_scan.button_proceed.clicked.connect(
             self.custom_scan.button_proceed_click
         )
-        
+
         self.custom_scan.show()
         self.custom_scan.setAttribute(Qt.WA_DeleteOnClose)
         # Output Command
@@ -302,6 +290,7 @@ class RealTimePlotterWidget(QWidget):
     # Button to trigger a calibration
     # @param self The object pointer
     # """
+
     def button_calibrate_click(self):
         self.quick_scan = DetailedGraphWidget()
         self.quick_scan.show()
@@ -314,6 +303,7 @@ class RealTimePlotterWidget(QWidget):
     # Button to control the PTU
     # @param self The object pointer
     # """
+
     def button_ptu_control_click(self):
         self.serial.write(self.command_h.encode())
 
@@ -322,5 +312,6 @@ class RealTimePlotterWidget(QWidget):
     # Button to trigger the help commands
     # @param self The object pointer
     # """
+
     def button_help_click(self):
         self.serial.write(self.command_d.encode())

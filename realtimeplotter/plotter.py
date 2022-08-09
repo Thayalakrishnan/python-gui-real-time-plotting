@@ -13,21 +13,10 @@ from PyQt5.QtDataVisualization import (
     # QScatterDataItem,
     QScatterDataProxy,
     QValue3DAxis,
-    QValue3DAxisFormatter
+    QValue3DAxisFormatter,
 )
-from PyQt5.QtCore import (
-    QTimer,
-    QObject
-)
-from PyQt5.QtGui import (
-    QColor,
-    QColorConstants, 
-    QFont, 
-    QVector3D
-)
-
-
-
+from PyQt5.QtCore import QTimer, QObject
+from PyQt5.QtGui import QColor, QColorConstants, QFont, QVector3D
 
 
 """ This class handles the entire plotting infrastructure. 
@@ -62,11 +51,7 @@ class Plotter(QObject):
         customTheme.setBackgroundColor(QColor(QColorConstants.Black))
         customTheme.setBackgroundEnabled(True)
         customTheme.setBaseColors(
-            [
-                QColorConstants.Red, 
-                QColorConstants.DarkRed, 
-                QColorConstants.Magenta
-            ]
+            [QColorConstants.Red, QColorConstants.DarkRed, QColorConstants.Magenta]
         )
         customTheme.setColorStyle(Q3DTheme.ColorStyleUniform)
         customTheme.setFont(QFont("Segoe UI"))
@@ -149,7 +134,9 @@ class Plotter(QObject):
 
     def addCustomItem(self, point):
         new_item = QCustom3DItem()
-        new_item.setMeshFile("C:\\dev\\github\\python-gui-real-time-plotting\\realtimeplotter\\sphere.obj")
+        new_item.setMeshFile(
+            "C:\\dev\\github\\python-gui-real-time-plotting\\realtimeplotter\\sphere.obj"
+        )
         new_item.setScaling(QVector3D(0.005, 0.005, 0.005))
         new_item.setPosition(point)
         self.graph.addCustomItem(new_item)
