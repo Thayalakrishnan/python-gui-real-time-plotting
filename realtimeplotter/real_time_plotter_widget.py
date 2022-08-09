@@ -50,6 +50,7 @@ from qtpy.QtDatavisualization import (
 from realtimeplotter.plotter import Plotter
 from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
 from realtimeplotter.custom_scan_widget import CustomScanWidget
+from realtimeplotter.helpers import GenericLayoutHelper
 
 
 """ RangeFinder Class
@@ -68,77 +69,103 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(RealTimePlotterWidget, self).__init__(parent)
-        self.message_le = QtWidgets.QLineEdit()
-        self.message_le.setFixedSize(120, 50)
-        self.send_btn = QtWidgets.QPushButton(text="Send to Board", clicked=self.send)
-        self.send_btn.setFixedSize(120, 50)
-        self.output_te = QtWidgets.QTextEdit(readOnly=True)
-        self.output_te.setFixedWidth(500)
-        self.button = QtWidgets.QPushButton(
-            text="Connect", checkable=True, toggled=self.on_toggled
-        )
-        self.button.setStyleSheet("background-color: red")
-        self.button.setFixedSize(120, 50)
+
+        """
+        Text and Line Edits
+        """        
+        self.lineedit_message = QtWidgets.QLineEdit()
+        self.lineedit_message.setFixedSize(120, 50)
+        
+        self.textedit_output = QtWidgets.QTextEdit(readOnly=True)
+        self.textedit_output.setFixedWidth(500)
+        
+        
         """ Timers (ms) """
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.start()
         self.timer.timeout.connect(self.receive)
+        
         """ Graphing """
         graph = Q3DScatter()
         screenSize = graph.screen().size()
-        self.container = QtWidgets.QWidget.createWindowContainer(graph)
-        self.container.setMinimumSize(QSize(500, 500))
-        self.container.setMaximumSize(screenSize)
-        self.container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.container.setFocusPolicy(Qt.StrongFocus)
+        self.graph_container = QtWidgets.QWidget.createWindowContainer(graph)
+        self.graph_container.setMinimumSize(QSize(500, 500))
+        self.graph_container.setMaximumSize(screenSize)
+        self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.graph_container.setFocusPolicy(Qt.StrongFocus)
         self.modifier = Plotter(graph)
 
         """ Buttons """
+        self.button_send = QtWidgets.QPushButton(text="Send to Board", clicked=self.send)
+        self.button_send.setFixedSize(120, 50)
+
+        self.button_connect = QtWidgets.QPushButton(
+            text="Connect", checkable=True, toggled=self.on_toggled
+        )
+        self.button_connect.setStyleSheet("background-color: red")
+        self.button_connect.setFixedSize(120, 50)
+
         self.button_quick_scan = QtWidgets.QPushButton()
         self.button_quick_scan.setFixedSize(120, 50)
         self.button_quick_scan.setText("Quick Scan")
         self.button_quick_scan.setStyleSheet(QSSLEDGBOX)
+        
         self.button_deep_scan = QtWidgets.QPushButton()
         self.button_deep_scan.setFixedSize(120, 50)
         self.button_deep_scan.setText("Deep Scan")
+        
         self.button_custom_scan = QtWidgets.QPushButton()
         self.button_custom_scan.setFixedSize(120, 50)
         self.button_custom_scan.setText("Custom Scan")
+        
         self.button_calibrate = QtWidgets.QPushButton()
         self.button_calibrate.setFixedSize(120, 50)
         self.button_calibrate.setText("Calibrate")
+        
         self.button_ptu_control = QtWidgets.QPushButton()
         self.button_ptu_control.setFixedSize(120, 50)
         self.button_ptu_control.setText("PTU Control")
+        
         self.button_help = QtWidgets.QPushButton()
         self.button_help.setFixedSize(120, 50)
         self.button_help.setText("Help!?")
+        
         """ Layout """
-        horizontal_layout = QtWidgets.QHBoxLayout(self)
-        vertical_layout_one = QtWidgets.QVBoxLayout()
-        vertical_layout_one.addWidget(self.container, 1)
-        vertical_layout_two = QtWidgets.QVBoxLayout()
-        vertical_layout_two.addWidget(self.output_te)
-        vertical_layout_three = QtWidgets.QVBoxLayout()
-        vertical_layout_three.addWidget(self.message_le)
-        vertical_layout_three.addWidget(self.send_btn)
-        vertical_layout_three.addWidget(self.button)
-        vertical_layout_three.addWidget(self.button_quick_scan)
-        vertical_layout_three.addWidget(self.button_deep_scan)
-        vertical_layout_three.addWidget(self.button_custom_scan)
-        vertical_layout_three.addWidget(self.button_calibrate)
-        vertical_layout_three.addWidget(self.button_ptu_control)
-        vertical_layout_three.addWidget(self.button_help)
-
-        horizontal_layout.addLayout(vertical_layout_one)
-        horizontal_layout.addLayout(vertical_layout_two)
-        horizontal_layout.addLayout(vertical_layout_three)
+        VBox = QtWidgets.QVBoxLayout(self)
+        
+        vbox_layout_one = QtWidgets.QVBoxLayout()
+        vbox_layout_one = GenericLayoutHelper(
+            QtWidgets.QVBoxLayout(), 
+            [
+                self.lineedit_message,
+                self.button_send,
+                self.button_connect,
+                self.button_quick_scan,
+                self.button_deep_scan,
+                self.button_custom_scan,
+                self.button_calibrate,
+                self.button_ptu_control,
+                self.button_help
+            ]
+        )
+        
+        hbox_layout_one = QtWidgets.QHBoxLayout()
+        hbox_layout_one.addWidget(self.graph_container)
+        hbox_layout_one.addLayout(vbox_layout_one)
+        
+        hbox_layout_two = QtWidgets.QHBoxLayout()
+        hbox_layout_two.addWidget(self.textedit_output, 1)
+        
+        VBox.addLayout(hbox_layout_one)
+        VBox.addLayout(hbox_layout_two)
+        
         """ Serial Connection configuration """
         self.serial = QtSerialPort.QSerialPort(
             "COM4", baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive
         )
         self.setWindowTitle("Range Finder")
+        
         """ commands """
         self.command_quick_scan = "-on-q"
         self.command_deep_scan = "-on-l"
@@ -157,7 +184,7 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
     def receive(self):
         while self.serial.canReadLine():
             raw_input_data = self.serial.readLine().data().decode()
-            self.output_te.append(raw_input_data)
+            self.textedit_output.append(raw_input_data)
             raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
             theta = math.radians(raw_input_data[1])
             phi = math.radians(raw_input_data[0])
@@ -166,8 +193,10 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
             x_val = distance * math.sin(theta) * math.cos(phi)
             y_val = distance * math.sin(theta) * math.sin(phi)
             z_val = distance * math.cos(theta)
-            self.output_te.append(f"x = {x_val} y = {y_val} z = {z_val}")
+            
+            self.textedit_output.append(f"x = {x_val} y = {y_val} z = {z_val}")
             self.plotbank.append(f"x = {x_val} y = {y_val} z = {z_val}")
+            
             pos = QVector3D(x_val, z_val, y_val)
             self.modifier.addCustomItem(pos)
 
@@ -176,21 +205,21 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
 
     @pyqtSlot()
     def send(self):
-        self.serial.write(self.message_le.text().encode())
+        self.serial.write(self.lineedit_message.text().encode())
 
     """ Method to create a serial connection with the board
     #  @param self The object pointer"""
 
     @pyqtSlot(bool)
     def on_toggled(self, checked):
-        self.button.setText("Disconnect" if checked else "Connect")
-        self.button.setStyleSheet(
+        self.button_connect.setText("Disconnect" if checked else "Connect")
+        self.button_connect.setStyleSheet(
             "background-color: green" if checked else "background-color: red"
         )
         if checked:
             if not self.serial.isOpen():
                 if not self.serial.open(QtCore.QIODevice.ReadWrite):
-                    self.button.setChecked(False)
+                    self.button_connect.setChecked(False)
         else:
             self.serial.close()
 
@@ -222,6 +251,7 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
 
     def button_custom_scan_click(self):
         self.custom_scan = CustomScanWidget()
+        
         self.custom_scan.slider_azimuth_max.valueChanged.connect(
             self.custom_scan.azimuth_max_change
         )
@@ -243,12 +273,13 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
         self.custom_scan.slider_samples_orientation.valueChanged.connect(
             self.custom_scan.samples_orientation_change
         )
-        self.custom_scan.button_main_menu.clicked.connect(
-            self.custom_scan.button_main_menu_click
+        self.custom_scan.button_close.clicked.connect(
+            self.custom_scan.button_close_click
         )
-        self.custom_scan.button_finish_setting_values.clicked.connect(
-            self.custom_scan.button_finish_setting_values_click
+        self.custom_scan.button_proceed.clicked.connect(
+            self.custom_scan.button_proceed_click
         )
+        
         self.custom_scan.show()
         self.custom_scan.setAttribute(Qt.WA_DeleteOnClose)
         # Output Command
