@@ -151,8 +151,11 @@ class Plotter(QObject):
       @param self The object pointer"""
 
     def addCustomItem(self, point):
+        print("[addCustomItem]")
+        print(point)
         new_item = QCustom3DItem()
-        new_item.setMeshFile("sphere.obj")
+        new_item.setMeshFile("C:\\dev\\github\\python-gui-real-time-plotting\\realtimeplotter\\sphere.obj")
+        # new_item.setScaling(QVector3D(0.005, 0.005, 0.005))
         new_item.setScaling(QVector3D(0.005, 0.005, 0.005))
         new_item.setPosition(point)
         self.graph.addCustomItem(new_item)

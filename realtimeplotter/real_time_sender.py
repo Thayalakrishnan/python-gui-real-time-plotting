@@ -131,6 +131,7 @@ class RealTimeSender(QtWidgets.QWidget):
             readyRead=self.receive,
             
         )
+        self.rng = np.random.default_rng(12345)
         self.serial.open(self.serial.ReadWrite)
 
     """ Method to read from serial, convert the data and send it to be plotted  """
@@ -141,6 +142,7 @@ class RealTimeSender(QtWidgets.QWidget):
             raw_input_data = self.serial.readLine().data().decode()
             self.textedit_output.append(f"[Received] {raw_input_data}")
             print(f"[Received] {raw_input_data}")
+            
             
             #raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
             #theta = math.radians(raw_input_data[1])
@@ -158,7 +160,11 @@ class RealTimeSender(QtWidgets.QWidget):
     @pyqtSlot()
     def send(self):
         # command = f'[Sent] {self.lineedit_message.text()}\r'
-        command = f'{"hello"}\r\n'
+        phi = self.rng.integers(low=-1500, high=1500)
+        dist = self.rng.integers(low=-1500, high=1500)
+        theta = self.rng.integers(low=-1500, high=1500)
+        
+        command = f'{phi},{dist},{theta}\r\n'
         self.serial.write(command.encode())
         self.textedit_output.append(f"[Sent] {command.encode()}")
         # self.serial.waitForBytesWritten(1000)

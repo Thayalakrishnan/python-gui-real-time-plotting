@@ -94,7 +94,7 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
         self.graph_container.setMaximumSize(screenSize)
         self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.graph_container.setFocusPolicy(Qt.StrongFocus)
-        self.modifier = Plotter(graph)
+        self.graph_modifed = Plotter(graph)
 
         """ Buttons """
         self.button_send = QtWidgets.QPushButton(text="Send to Board", clicked=self.send)
@@ -191,17 +191,24 @@ class RealTimePlotterWidget(QtWidgets.QWidget):
             print(raw_input_data)
             self.textedit_output.append(f"{raw_input_data}")
             
-            #raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
-            #theta = math.radians(raw_input_data[1])
+            raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
+            
             #phi = math.radians(raw_input_data[0])
+            #theta = math.radians(raw_input_data[1])
             #distance = raw_input_data[2]
+            
             #x_val = distance * math.sin(theta) * math.cos(phi)
             #y_val = distance * math.sin(theta) * math.sin(phi)
             #z_val = distance * math.cos(theta)
-            #self.textedit_output.append(f"x = {x_val} y = {y_val} z = {z_val}")
-            #self.plotbank.append(f"x = {x_val} y = {y_val} z = {z_val}")
-            #pos = QVector3D(x_val, z_val, y_val)
-            #self.modifier.addCustomItem(pos)
+
+            x_val = raw_input_data[0]
+            y_val = raw_input_data[1]
+            z_val = raw_input_data[2]
+            
+            self.textedit_output.append(f"x = {x_val} y = {y_val} z = {z_val}")
+            self.plotbank.append(f"x = {x_val} y = {y_val} z = {z_val}")
+            pos = QVector3D(x_val, z_val, y_val)
+            self.graph_modifed.addCustomItem(pos)
 
     """ Method to send commands via serial
     #  @param self The object pointer"""
