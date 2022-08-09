@@ -12,6 +12,7 @@ from realtimeplotter.theme import ApplicationTheme
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
+    
     app.setPalette(ApplicationTheme())
 
     w = RealTimePlotterWidget()

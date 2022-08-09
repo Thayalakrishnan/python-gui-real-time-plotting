@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
 )
-from helpers import GenericLayoutHelper
+
 from theme import ApplicationTheme
 
 
@@ -28,6 +28,12 @@ from theme import ApplicationTheme
     
     Methods from this class control the user interaction.
 """
+
+def GenericLayoutHelper(layout_box, arr_widgets):
+    for w in arr_widgets:
+        layout_box.addWidget(w)
+    return layout_box
+
 
 
 class RealTimeSender(QWidget):

@@ -1,13 +1,16 @@
-""" @package RangeFinder
-This package contains all the classes that are used to create an instance of the GUI
-The classes dont take any input and run off of each other. Button input triggers the 
-instance of one of these classes as every class generates a new window, except the plotting 
+"""
+CustomScanWidget
 """
 from PyQt5 import QtSerialPort
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QWidget, QGroupBox, QPushButton, QVBoxLayout, QHBoxLayout
-
+from PyQt5.QtWidgets import (
+    QWidget, 
+    QGroupBox, 
+    QPushButton, 
+    QVBoxLayout, 
+    QHBoxLayout
+)
 from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
 from realtimeplotter.helpers import (
     LCDWidgetHelper,
@@ -183,7 +186,10 @@ class CustomScanWidget(QWidget):
         self.GBox_Azimuth.setLayout(self.Vbox_Azimuth)
         self.Vbox_Azimuth.addLayout(
             HBoxLayoutHelper(
-                [self.label_azimuth_min, self.slider_azimuth_min, self.lcd_azimuth_min]
+                [
+                    self.label_azimuth_min, 
+                    self.slider_azimuth_min, 
+                    self.lcd_azimuth_min]
             )
         )
         self.Vbox_Azimuth.addLayout(
@@ -279,63 +285,90 @@ class CustomScanWidget(QWidget):
         font.setKerning(False)
         self.setFont(font)
 
-    """ Azimuth Max Slider
-    @param self The object pointer."""
+    
+    """
+    Azimuth Max Slider
+    @param self The object pointer.
+    """
 
     def azimuth_max_change(self):
         size = self.slider_azimuth_max.value()
         self.lcd_azimuth_max.display(size)
 
-    """ Azimuth Min Slider.
-    @param self The object pointer."""
+    
+    """
+    Azimuth Min Slider.
+    @param self The object pointer.
+    """
 
     def azimuth_min_change(self):
         size = self.slider_azimuth_min.value()
         self.lcd_azimuth_min.display(size)
 
-    """ Elevation Max Slider.
-    @param self The object pointer."""
+    
+    """
+    Elevation Max Slider.
+    @param self The object pointer.
+    """
 
     def elevation_max_change(self):
         size = self.slider_elevation_max.value()
         self.lcd_elevation_max.display(size)
 
-    """ Azimuth Max Slider.
-    @param self The object pointer."""
+    
+    """
+    Azimuth Max Slider.
+    @param self The object pointer.
+    """
 
     def elevation_min_change(self):
         size = self.slider_elevation_min.value()
         self.lcd_elevation_min.display(size)
 
-    """ Elevation Min Slider.
-    @param self The object pointer."""
+    
+    """
+    Elevation Min Slider.
+    @param self The object pointer.
+    """
 
     def scan_frequency_change(self):
         size = self.slider_scan_frequency.value()
         self.lcd_scan_frequency.display(size)
 
-    """ Step Change Slider.
-    @param self The object pointer."""
+    
+    """
+    Step Change Slider.
+    @param self The object pointer.
+    """
 
     def step_change_change(self):
         size = self.slider_step_change.value()
         self.lcd_step_change.display(size)
 
-    """ Samples per orientaion Slider.
-    @param self The object pointer."""
+    
+    """
+    Samples per orientaion Slider.
+    @param self The object pointer.
+    """
 
     def samples_orientation_change(self):
         size = self.slider_samples_orientation.value()
         self.lcd_samples_orientation.display(size)
 
-    """ Button for main menu
-    @param self The object pointer."""
+    
+    """
+    Button for main menu
+    @param self The object pointer.
+    """
 
     def button_close_click(self):
         self.close()
 
-    """ Button to trigger the beggining of the custom scan. takes the values here and sends them via serial to modify the scan
-    @param self The object pointer."""
+    
+    """
+    Button to trigger the beggining of the custom scan. takes the values here and sends them via serial to modify the scan
+    @param self The object pointer.
+    """
 
     def button_proceed_click(self):
         self.finish_setting_values = DetailedGraphWidget()
