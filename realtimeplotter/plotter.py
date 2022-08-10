@@ -5,12 +5,10 @@ from PyQt5.QtDataVisualization import (
     Q3DCamera,
     Q3DScatter,
     Q3DTheme,
-    # QAbstract3DAxis,
     QAbstract3DGraph,
     QAbstract3DSeries,
     QCustom3DItem,
     QScatter3DSeries,
-    # QScatterDataItem,
     QScatterDataProxy,
     QValue3DAxis,
     QValue3DAxisFormatter,
@@ -152,15 +150,6 @@ class Plotter(QObject):
 
     """ Function to plot the given data point
       @param self The object pointer"""
-
-    #def add_new_item(self, point):
-    #    new_item = QCustom3DItem()
-    #    new_item.setMeshFile(
-    #        "C:\\dev\\github\\python-gui-real-time-plotting\\realtimeplotter\\sphere.obj"
-    #    )
-    #    new_item.setScaling(QVector3D(0.005, 0.005, 0.005))
-    #    new_item.setPosition(point)
-    #    self.graph.addCustomItem(new_item)
 
     def get_new_point(self, pos):
         new_item = QCustom3DItem()

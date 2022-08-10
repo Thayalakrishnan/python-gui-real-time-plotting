@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QSizePolicy,
 )
+import math
 from PyQt5.QtDataVisualization import Q3DScatter
 from PyQt5.QtGui import QVector3D
 from realtimeplotter.plotter import Plotter
@@ -154,27 +155,36 @@ class RealTimePlotterWidget(QWidget):
     Method to read from serial, convert the data and send it to be plotted  
     """
     #  @param self The object pointer
+    
     @pyqtSlot()
     def receive(self):
         while self.serial.canReadLine():
             raw_input_data = self.serial.readLine().data().decode()
-            #raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
-            
-            # phi = math.radians(raw_input_data[0])
-            # theta = math.radians(raw_input_data[1])
-            # distance = raw_input_data[2]
-            #self.plotbank.append((x_val, z_val, y_val))
-            
-            # x_val = distance * math.sin(theta) * math.cos(phi)
-            # y_val = distance * math.sin(theta) * math.sin(phi)
-            # z_val = distance * math.cos(theta)
-            
-            #x_val = raw_input_data[0]
-            #y_val = raw_input_data[1]
-            #z_val = raw_input_data[2]
-            
             x_val, y_val, z_val = map(int, raw_input_data.rstrip("\r\n").split(","))
             self.textedit_output.append(f"({x_val}, {y_val}, {z_val})")
+            pos = QVector3D(x_val, z_val, y_val)
+            self.graph_instance.add_new_item(pos)
+
+    @pyqtSlot()
+    def receive_production(self):
+        while self.serial.canReadLine():
+            # get the data
+            raw_input_data = self.serial.readLine().data().decode()
+            raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
+            
+            # convert the data to be plotted on  a cartesian plot in 3D
+            phi = math.radians(raw_input_data[0])
+            theta = math.radians(raw_input_data[1])
+            distance = raw_input_data[2]
+            
+            x_val = distance * math.sin(theta) * math.cos(phi)
+            y_val = distance * math.sin(theta) * math.sin(phi)
+            z_val = distance * math.cos(theta)
+            
+            self.plotbank.append((x_val, z_val, y_val))
+            self.textedit_output.append(f"({x_val}, {y_val}, {z_val})")
+            
+            # send the point to be plotted
             pos = QVector3D(x_val, z_val, y_val)
             self.graph_instance.add_new_item(pos)
 
