@@ -1,11 +1,11 @@
 """
-RealTimeSender
-This package contains the RealTimeSender class used for simulating and testing the serial connection
+LivePlotSimulator
+This package contains the LivePlotSimulator class used for simulating and testing the serial connection
 """
-import sys
+from time import sleep
 import numpy as np
 from PyQt5 import QtSerialPort
-from PyQt5.QtCore import pyqtSlot, QTimer, QIODevice
+from PyQt5.QtCore import pyqtSlot, QTimer, QIODevice, Qt
 from PyQt5.QtWidgets import (
     QApplication,
     QWidget,
@@ -16,7 +16,8 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
 )
 
-from theme import ApplicationTheme
+
+COM_PORT = "COM6"
 
 
 """ RangeFinder Class
@@ -36,11 +37,12 @@ def GenericLayoutHelper(layout_box, arr_widgets):
 
 
 
-class RealTimeSender(QWidget):
+class LivePlotSimulator(QWidget):
     """The constructor."""
 
     def __init__(self, parent=None):
-        super(RealTimeSender, self).__init__(parent)
+        super(LivePlotSimulator, self).__init__(parent)
+
 
         """
         Text and Line Edits
@@ -49,7 +51,7 @@ class RealTimeSender(QWidget):
         self.lineedit_message.setFixedSize(120, 50)
 
         self.textedit_output = QTextEdit(readOnly=True)
-        self.textedit_output.setFixedWidth(500)
+        self.textedit_output.setMinimumWidth(200)
 
         """ Timers (ms) """
         self.timer = QTimer(self)
@@ -58,8 +60,14 @@ class RealTimeSender(QWidget):
         self.timer.timeout.connect(self.receive)
 
         """ Buttons """
-        self.button_send = QPushButton(text="Send to Board", clicked=self.send)
+        self.button_send = QPushButton(text="Send Custom Data", clicked=self.send)
         self.button_send.setFixedSize(120, 50)
+
+        self.button_send_scatter_data = QPushButton(text="Send Scatter Data", clicked=self.send_scatter_data)
+        self.button_send_scatter_data.setFixedSize(120, 50)
+
+        self.button_send_spiral_data = QPushButton(text="Send Scatter Data", clicked=self.send_spiral_data)
+        self.button_send_spiral_data.setFixedSize(120, 50)
 
         self.button_connect = QPushButton(
             text="Connect", checkable=True, toggled=self.on_toggled
@@ -68,28 +76,24 @@ class RealTimeSender(QWidget):
         self.button_connect.setFixedSize(120, 50)
 
         """ Layout """
-        VBox = QVBoxLayout(self)
+        HBox = QHBoxLayout(self)
 
-        vbox_layout_one = QVBoxLayout()
-        vbox_layout_one = GenericLayoutHelper(
-            QVBoxLayout(),
-            [
-                self.lineedit_message,
-                self.button_send,
-                self.button_connect,
-            ],
-        )
+        vbox_buttons = QVBoxLayout()
+        vbox_buttons.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        vbox_buttons.addWidget(self.lineedit_message,)
+        vbox_buttons.addWidget(self.button_send,)
+        vbox_buttons.addWidget(self.button_connect,)
+        vbox_buttons.addWidget(self.button_send_scatter_data,)
+        vbox_buttons.addWidget(self.button_send_spiral_data,)
 
-        hbox_layout_one = QHBoxLayout()
-        hbox_layout_one.addLayout(vbox_layout_one)
 
-        hbox_layout_two = QHBoxLayout()
-        hbox_layout_two.addWidget(self.textedit_output, 1)
+        vbox_textedit = QVBoxLayout()
+        vbox_textedit.addWidget(self.textedit_output, 1)
 
-        VBox.addLayout(hbox_layout_one)
-        VBox.addLayout(hbox_layout_two)
+        HBox.addLayout(vbox_textedit)
+        HBox.addLayout(vbox_buttons)
 
-        self.setWindowTitle("Range Finder")
+        self.setWindowTitle("Live Plot Simulator")
 
         """ commands """
         self.command_d = "d"
@@ -99,7 +103,7 @@ class RealTimeSender(QWidget):
 
         """ Serial Connection configuration """
         self.serial = QtSerialPort.QSerialPort(
-            "COM6",
+            COM_PORT,
             baudRate=QtSerialPort.QSerialPort.Baud9600,
             readyRead=self.receive,
         )
@@ -120,14 +124,30 @@ class RealTimeSender(QWidget):
 
     @pyqtSlot()
     def send(self):
-        # command = f'[Sent] {self.lineedit_message.text()}\r'
-        x_point = self.rng.integers(low=-1500, high=1500)
-        y_point = self.rng.integers(low=-1500, high=1500)
-        z_point = self.rng.integers(low=0, high=3000)
-        command = f"{x_point},{y_point},{z_point}\r\n"
-
+        command = f"{self.lineedit_message.text()}\r\n"
         self.serial.write(command.encode())
-        self.textedit_output.append(f"[Sent] {command.encode()}")
+        self.textedit_output.append(f"[Sent] {command}")
+
+    @pyqtSlot()
+    def send_scatter_data(self):
+        
+        for i in range(100):
+            command = f"{self.get_x_value()},{self.get_y_value()},{self.get_z_value()}\r\n"
+            self.serial.write(command.encode())
+            self.textedit_output.append(f"[Sent] {command}")
+            #sleep(0.1)
+
+    @pyqtSlot()
+    def send_spiral_data(self):
+        for i in range(100):
+            zdata = self.get_z_value()
+            xdata = int(np.sin(zdata) + self.rng.integers(low=0, high=1000))
+            ydata = int(np.cos(zdata) + self.rng.integers(low=0, high=1000))
+            
+            command = f"{xdata},{ydata},{zdata}\r\n"
+            self.serial.write(command.encode())
+            self.textedit_output.append(f"[Sent] {command}")
+            #sleep(0.1)
 
     """ Method to create a serial connection with the board
     #  @param self The object pointer"""
@@ -146,17 +166,24 @@ class RealTimeSender(QWidget):
                     self.button_connect.setChecked(False)
         else:
             self.serial.close()
+    
+    def get_x_value(self):
+        return self.rng.integers(low=0, high=1000)
+    
+    def get_y_value(self):
+        return self.rng.integers(low=0, high=1000)
+    
+    def get_z_value(self):
+        return self.rng.integers(low=0, high=1000)
+    
+    
+    def oldsend(self):
+        # command = f'[Sent] {self.lineedit_message.text()}\r'
+        x_point = self.rng.integers(low=0, high=1000)
+        y_point = self.rng.integers(low=0, high=1000)
+        z_point = self.rng.integers(low=0, high=1000)
+        
+        command = f"{x_point},{y_point},{z_point}\r\n"
 
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setPalette(ApplicationTheme())
-    w = RealTimeSender()
-
-    """ 
-    Initialise the Sliders 
-    """
-
-    w.show()
-    sys.exit(app.exec_())
+        self.serial.write(command.encode())
+        self.textedit_output.append(f"[Sent] {command.encode()}")

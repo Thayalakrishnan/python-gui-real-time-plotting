@@ -33,6 +33,8 @@ Methods from this class control the user interaction.
 """
 
 
+COM_PORT = "COM5"
+
 class RealTimePlotterWidget(QWidget):
     """
     The constructor.
@@ -60,14 +62,16 @@ class RealTimePlotterWidget(QWidget):
         """
         Graphing 
         """
-        graph = Q3DScatter()
-        screenSize = graph.screen().size()
-        self.graph_container = QWidget.createWindowContainer(graph)
-        self.graph_container.setMinimumSize(QSize(500, 500))
+        # graph = Q3DScatter()
+        #graph = Plotter()
+        #screenSize = graph.screen().size()
+        #self.graph_container = QWidget.createWindowContainer(graph)
+        #self.graph_container.setMinimumSize(QSize(500, 500))
         # self.graph_container.setMaximumSize(screenSize)
-        self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.graph_container.setFocusPolicy(Qt.StrongFocus)
-        self.graph_modifed = Plotter(graph)
+        #self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.graph_container.setFocusPolicy(Qt.StrongFocus)
+        self.graph_instance = Plotter()
+        self.graph_container = self.graph_instance.graph_container
 
         """
         Buttons 
@@ -140,7 +144,7 @@ class RealTimePlotterWidget(QWidget):
         Serial Connection configuration 
         """
         self.serial = QtSerialPort.QSerialPort(
-            "COM5", baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive
+            COM_PORT, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive
         )
 
         self.serial.open(self.serial.ReadWrite)
@@ -181,7 +185,7 @@ class RealTimePlotterWidget(QWidget):
             self.textedit_output.append(f"x = {x_val} y = {y_val} z = {z_val}")
             self.plotbank.append(f"x = {x_val} y = {y_val} z = {z_val}")
             pos = QVector3D(x_val, z_val, y_val)
-            self.graph_modifed.addCustomItem(pos)
+            self.graph_instance.add_new_item(pos)
 
     """
     Method to send commands via serial
