@@ -338,4 +338,5 @@ class RealTimePlotterWidget(QWidget):
         self.serial.write(self.command_d.encode())
 
     def button_reset_plot_click(self):
+        self.graph_instance.reset_graph()
         print("Reset!")

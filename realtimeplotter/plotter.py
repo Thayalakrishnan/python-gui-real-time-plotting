@@ -174,4 +174,7 @@ class Plotter(QObject):
     def add_new_item(self, pos):
         point = QScatterDataItem(pos)
         self.scatter_proxy.addItem(point)
+
+    def reset_graph(self):
+        self.scatter_proxy.resetArray()
         
