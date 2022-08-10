@@ -62,14 +62,6 @@ class RealTimePlotterWidget(QWidget):
         """
         Graphing 
         """
-        # graph = Q3DScatter()
-        #graph = Plotter()
-        #screenSize = graph.screen().size()
-        #self.graph_container = QWidget.createWindowContainer(graph)
-        #self.graph_container.setMinimumSize(QSize(500, 500))
-        # self.graph_container.setMaximumSize(screenSize)
-        #self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        #self.graph_container.setFocusPolicy(Qt.StrongFocus)
         self.graph_instance = Plotter()
         self.graph_container = self.graph_instance.graph_container
 
@@ -112,33 +104,27 @@ class RealTimePlotterWidget(QWidget):
         """
         Layout 
         """
-        VBox = QVBoxLayout(self)
+        hbox = QHBoxLayout(self)
 
-        vbox_layout_one = QVBoxLayout()
-        vbox_layout_one = GenericLayoutHelper(
-            QVBoxLayout(),
-            [
-                self.lineedit_message,
-                self.button_send,
-                self.button_connect,
-                self.button_quick_scan,
-                self.button_deep_scan,
-                self.button_custom_scan,
-                self.button_calibrate,
-                self.button_ptu_control,
-                self.button_help,
-            ],
-        )
+        vbox_buttons = QVBoxLayout()
+        vbox_buttons.addWidget(self.lineedit_message)
+        vbox_buttons.addWidget(self.button_send)
+        vbox_buttons.addWidget(self.button_connect)
+        vbox_buttons.addWidget(self.button_quick_scan)
+        vbox_buttons.addWidget(self.button_deep_scan)
+        vbox_buttons.addWidget(self.button_custom_scan)
+        vbox_buttons.addWidget(self.button_calibrate)
+        vbox_buttons.addWidget(self.button_ptu_control)
+        vbox_buttons.addWidget(self.button_help)
+        vbox_buttons.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        
+        vbox_texedit = QVBoxLayout()
+        vbox_texedit.addWidget(self.textedit_output)
 
-        hbox_layout_one = QHBoxLayout()
-        hbox_layout_one.addWidget(self.graph_container)
-        hbox_layout_one.addLayout(vbox_layout_one)
-
-        hbox_layout_two = QHBoxLayout()
-        hbox_layout_two.addWidget(self.textedit_output, 1)
-
-        VBox.addLayout(hbox_layout_one)
-        VBox.addLayout(hbox_layout_two)
+        hbox.addWidget(self.graph_container)
+        hbox.addLayout(vbox_texedit)
+        hbox.addLayout(vbox_buttons)
+        
 
         """
         Serial Connection configuration 
@@ -172,18 +158,23 @@ class RealTimePlotterWidget(QWidget):
     def receive(self):
         while self.serial.canReadLine():
             raw_input_data = self.serial.readLine().data().decode()
-            raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
+            #raw_input_data = list(map(int, raw_input_data.rstrip("\r\n").split(",")))
+            
             # phi = math.radians(raw_input_data[0])
             # theta = math.radians(raw_input_data[1])
             # distance = raw_input_data[2]
+            #self.plotbank.append((x_val, z_val, y_val))
+            
             # x_val = distance * math.sin(theta) * math.cos(phi)
             # y_val = distance * math.sin(theta) * math.sin(phi)
             # z_val = distance * math.cos(theta)
-            x_val = raw_input_data[0]
-            y_val = raw_input_data[1]
-            z_val = raw_input_data[2]
-            self.textedit_output.append(f"x = {x_val} y = {y_val} z = {z_val}")
-            self.plotbank.append(f"x = {x_val} y = {y_val} z = {z_val}")
+            
+            #x_val = raw_input_data[0]
+            #y_val = raw_input_data[1]
+            #z_val = raw_input_data[2]
+            
+            x_val, y_val, z_val = map(int, raw_input_data.rstrip("\r\n").split(","))
+            self.textedit_output.append(f"({x_val}, {y_val}, {z_val})")
             pos = QVector3D(x_val, z_val, y_val)
             self.graph_instance.add_new_item(pos)
 

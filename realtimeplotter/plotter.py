@@ -25,7 +25,19 @@ from PyQt5.QtGui import QColor, QColorConstants, QFont, QVector3D
   The graph is a scatter plot and is pannable and zoomable. """
 
 
+
 MESH_FILE_LOCATION = "C:\\dev\\github\\python-gui-real-time-plotting\\realtimeplotter\\sphere.obj"
+
+AXIS_MIN = -20
+AXIS_MAX = 20
+
+X_AXIS_MIN = AXIS_MIN
+X_AXIS_MAX = AXIS_MAX
+Y_AXIS_MIN = AXIS_MIN
+Y_AXIS_MAX = AXIS_MAX
+Z_AXIS_MIN = AXIS_MIN
+Z_AXIS_MAX = AXIS_MAX
+
 
 def CreateAxis(
     axis_proxy, axis_title, axis_title_visible, axis_segs, axis_subsegs
@@ -130,9 +142,9 @@ class Plotter(QObject):
 
         """ Axis Range """
         self.graph.setTitle("Range finder")
-        self.graph.axisX().setRange(0, 1000)
-        self.graph.axisY().setRange(0, 1000)
-        self.graph.axisZ().setRange(0, 1000)
+        self.graph.axisX().setRange(X_AXIS_MIN, X_AXIS_MAX)
+        self.graph.axisY().setRange(Y_AXIS_MIN,Y_AXIS_MAX)
+        self.graph.axisZ().setRange(Z_AXIS_MIN,Z_AXIS_MAX)
 
         self.graph.seriesList()[0].setMesh(self.m_style)
         self.graph.seriesList()[0].setMeshSmooth(self.m_smooth)

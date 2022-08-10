@@ -2,7 +2,6 @@
 LivePlotSimulator
 This package contains the LivePlotSimulator class used for simulating and testing the serial connection
 """
-from time import sleep
 import numpy as np
 from PyQt5 import QtSerialPort
 from PyQt5.QtCore import pyqtSlot, QTimer, QIODevice, Qt
@@ -18,7 +17,15 @@ from PyQt5.QtWidgets import (
 
 
 COM_PORT = "COM6"
+AXIS_MIN = -20
+AXIS_MAX = 20
 
+X_AXIS_MIN = AXIS_MIN
+X_AXIS_MAX = AXIS_MAX
+Y_AXIS_MIN = AXIS_MIN
+Y_AXIS_MAX = AXIS_MAX
+Z_AXIS_MIN = AXIS_MIN
+Z_AXIS_MAX = AXIS_MAX
 
 """ RangeFinder Class
     This class creates an instance of the rangefiner application, inclduing the layout,
@@ -63,10 +70,10 @@ class LivePlotSimulator(QWidget):
         self.button_send = QPushButton(text="Send Custom Data", clicked=self.send)
         self.button_send.setFixedSize(120, 50)
 
-        self.button_send_scatter_data = QPushButton(text="Send Scatter Data", clicked=self.send_scatter_data)
+        self.button_send_scatter_data = QPushButton(text="Send Scatter Plot", clicked=self.send_scatter_data)
         self.button_send_scatter_data.setFixedSize(120, 50)
 
-        self.button_send_spiral_data = QPushButton(text="Send Scatter Data", clicked=self.send_spiral_data)
+        self.button_send_spiral_data = QPushButton(text="Send Demo Plot", clicked=self.send_demo_plot)
         self.button_send_spiral_data.setFixedSize(120, 50)
 
         self.button_connect = QPushButton(
@@ -132,22 +139,34 @@ class LivePlotSimulator(QWidget):
     def send_scatter_data(self):
         
         for i in range(100):
-            command = f"{self.get_x_value()},{self.get_y_value()},{self.get_z_value()}\r\n"
+            command = f"{self.get_random_value()},{self.get_random_value()},{self.get_random_value()}\r\n"
             self.serial.write(command.encode())
             self.textedit_output.append(f"[Sent] {command}")
             #sleep(0.1)
 
     @pyqtSlot()
-    def send_spiral_data(self):
-        for i in range(100):
-            zdata = self.get_z_value()
-            xdata = int(np.sin(zdata) + self.rng.integers(low=0, high=1000))
-            ydata = int(np.cos(zdata) + self.rng.integers(low=0, high=1000))
+    def send_demo_plot(self):
+        # create sphere parameters        
+        r = 20
+        pi = np.pi
+        cos = np.cos
+        sin = np.sin
+        phi, theta = np.mgrid[0:pi:51j, 0:2 * pi:51j]
+        
+        x = r*sin(phi)*cos(theta)
+        y = r*sin(phi)*sin(theta)
+        z = r*cos(phi)
+        # loop over arrays to send sphere ass cartesian coords to plot
+        for i in range(len(x)):
+            for j in range(len(x)):
+                xdata = int(x[i][j])
+                ydata = int(y[i][j])
+                zdata = int(z[i][j])
+                
+                command = f"{xdata},{ydata},{zdata}\r\n"
+                self.serial.write(command.encode())
+                self.textedit_output.append(f"[Sent] {command}")
             
-            command = f"{xdata},{ydata},{zdata}\r\n"
-            self.serial.write(command.encode())
-            self.textedit_output.append(f"[Sent] {command}")
-            #sleep(0.1)
 
     """ Method to create a serial connection with the board
     #  @param self The object pointer"""
@@ -167,21 +186,14 @@ class LivePlotSimulator(QWidget):
         else:
             self.serial.close()
     
-    def get_x_value(self):
-        return self.rng.integers(low=0, high=1000)
-    
-    def get_y_value(self):
-        return self.rng.integers(low=0, high=1000)
-    
-    def get_z_value(self):
-        return self.rng.integers(low=0, high=1000)
-    
+    def get_random_value(self):
+        return self.rng.integers(low=AXIS_MIN, high=AXIS_MAX)
     
     def oldsend(self):
         # command = f'[Sent] {self.lineedit_message.text()}\r'
-        x_point = self.rng.integers(low=0, high=1000)
-        y_point = self.rng.integers(low=0, high=1000)
-        z_point = self.rng.integers(low=0, high=1000)
+        x_point = self.get_random_value()
+        y_point = self.get_random_value()
+        z_point = self.get_random_value()
         
         command = f"{x_point},{y_point},{z_point}\r\n"
 
