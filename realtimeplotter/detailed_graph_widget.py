@@ -1,17 +1,8 @@
-""" @package RangeFinder
-  This package contains all the classes that are used to create an instance of the GUI
-  The classes dont take any input and run off of each other. Button input triggers the 
- instance of one of these classes as every class generates a new window, except the plotting 
 """
-from PyQt5.QtCore import QSize, Qt
-
+DetailedGraphWidget
+"""
 from PyQt5.QtWidgets import (
-    QFrame,
-    QHBoxLayout,
-    QLabel,
-    QLCDNumber,
     QPushButton,
-    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -19,36 +10,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtDataVisualization import Q3DScatter
 
 from realtimeplotter.plotter import Plotter
-
 from realtimeplotter.helpers import HBoxLayoutHelper, LCDWidgetHelper, LabelWidgetHelper
-
-
-def CreateLCD(
-    lcd_object_name, lcd_has_decimal_point, size_width, size_height
-) -> QLCDNumber:
-    lcd = QLCDNumber()
-    lcd.setFrameShape(QFrame.NoFrame)
-    lcd.setSmallDecimalPoint(lcd_has_decimal_point)
-    lcd.setObjectName(lcd_object_name)
-    lcd.setFixedSize(size_width, size_height)
-    return lcd
-
-
-def CreateLabel(label_text, label_size_width, label_size_height) -> QLabel:
-    label = QLabel()
-    label.setFixedSize(label_size_width, label_size_height)
-    label.setFrameShape(QFrame.StyledPanel)
-    label.setAlignment(Qt.AlignCenter)
-    label.setText(label_text)
-    return label
-
-
-def CreateLCDLabelHBox(lcd_widget, label_widget) -> QLabel:
-    h_lay = QHBoxLayout()
-    h_lay.addWidget(lcd_widget)
-    h_lay.addWidget(label_widget)
-    return h_lay
-
 
 """ DetailedGraphWidget
     This class creates an instance of the graphing console
@@ -77,15 +39,11 @@ class DetailedGraphWidget(QWidget):
         self.lcd_ele = LCDWidgetHelper("lcd_ele", False, 120, 50)
         self.lcd_dis = LCDWidgetHelper("lcd_dis", False, 120, 50)
 
-        """ Graphing """
-        graph = Q3DScatter()
-        screenSize = graph.screen().size()
-        self.graph_container = QWidget.createWindowContainer(graph)
-        self.graph_container.setMinimumSize(QSize(300, 300))
-        self.graph_container.setMaximumSize(screenSize)
-        self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.graph_container.setFocusPolicy(Qt.StrongFocus)
-        self.modified_graph = Plotter(graph)
+        """
+        Graphing 
+        """
+        self.graph_instance = Plotter()
+        self.graph_container = self.graph_instance.graph_container
 
         """ Labels """
         self.label_acc = LabelWidgetHelper("Accelerometer", 120, 50)

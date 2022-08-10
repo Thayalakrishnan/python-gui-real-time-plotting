@@ -1,8 +1,9 @@
-""" @package RangeFinder
-  This package contains all the classes that are used to create an instance of the GUI
-  The classes dont take any input and run off of each other. Button input triggers the 
- instance of one of these classes as every class generates a new window, except the plotting 
 """
+RealTimePlotterWidget
+"""
+import math
+from turtle import width
+
 from PyQt5 import QtSerialPort
 from PyQt5.QtCore import pyqtSlot, QSize, Qt, QTimer, QIODevice
 from PyQt5.QtWidgets import (
@@ -14,9 +15,10 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QSizePolicy,
 )
-import math
+
 from PyQt5.QtDataVisualization import Q3DScatter
 from PyQt5.QtGui import QVector3D
+
 from realtimeplotter.plotter import Plotter
 from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
 from realtimeplotter.custom_scan_widget import CustomScanWidget
@@ -102,6 +104,15 @@ class RealTimePlotterWidget(QWidget):
         self.button_help.setFixedSize(120, 50)
         self.button_help.setText("Help!?")
 
+        self.button_reset_plot = QPushButton(
+            self,
+            text="Reset Plot", 
+            clicked=self.button_reset_plot_click
+        )
+        self.button_reset_plot.setFixedSize(120, 50)
+        #self.button_reset_plot.setText("Reset Plot")
+        
+        
         """
         Layout 
         """
@@ -117,6 +128,7 @@ class RealTimePlotterWidget(QWidget):
         vbox_buttons.addWidget(self.button_calibrate)
         vbox_buttons.addWidget(self.button_ptu_control)
         vbox_buttons.addWidget(self.button_help)
+        vbox_buttons.addWidget(self.button_reset_plot)
         vbox_buttons.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
         
         vbox_texedit = QVBoxLayout()
@@ -150,6 +162,7 @@ class RealTimePlotterWidget(QWidget):
         self.command_h = "h"
 
         self.plotbank = []
+        self.counter = 0
 
     """
     Method to read from serial, convert the data and send it to be plotted  
@@ -161,9 +174,14 @@ class RealTimePlotterWidget(QWidget):
         while self.serial.canReadLine():
             raw_input_data = self.serial.readLine().data().decode()
             x_val, y_val, z_val = map(int, raw_input_data.rstrip("\r\n").split(","))
-            self.textedit_output.append(f"({x_val}, {y_val}, {z_val})")
+            #self.textedit_output.append(f"({x_val}, {y_val}, {z_val})")
+            
+            self.counter += 1
+            self.textedit_output.append(f"{self.counter}")
+            
             pos = QVector3D(x_val, z_val, y_val)
             self.graph_instance.add_new_item(pos)
+            
 
     @pyqtSlot()
     def receive_production(self):
@@ -318,3 +336,6 @@ class RealTimePlotterWidget(QWidget):
 
     def button_help_click(self):
         self.serial.write(self.command_d.encode())
+
+    def button_reset_plot_click(self):
+        print("Reset!")

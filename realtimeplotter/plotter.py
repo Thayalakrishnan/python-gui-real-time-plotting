@@ -12,6 +12,7 @@ from PyQt5.QtDataVisualization import (
     QScatterDataProxy,
     QValue3DAxis,
     QValue3DAxisFormatter,
+    QScatterDataItem
 )
 from PyQt5.QtWidgets import QWidget, QSizePolicy
 from PyQt5.QtCore import QTimer, QObject, QSize, Qt
@@ -37,7 +38,7 @@ Z_AXIS_MIN = AXIS_MIN
 Z_AXIS_MAX = AXIS_MAX
 
 
-def CreateAxis(
+def CreateAxisHelper(
     axis_proxy, axis_title, axis_title_visible, axis_segs, axis_subsegs
 ) -> QValue3DAxis:
     axis = QValue3DAxis(axis_proxy)
@@ -57,6 +58,8 @@ class Plotter(QObject):
         self.m_style = QAbstract3DSeries.MeshSphere
         self.m_smooth = True
         self.plot_timer = QTimer()
+        
+        self.counter = 0
 
         self.graph_container = QWidget.createWindowContainer(self.graph)
         self.graph_container.setMinimumSize(QSize(500, 500))
@@ -69,6 +72,7 @@ class Plotter(QObject):
         customTheme.setAmbientLightStrength(0.3)
         customTheme.setBackgroundColor(QColor(42, 42, 42))
         customTheme.setBackgroundEnabled(True)
+        customTheme.setBackgroundEnabled(False)
         customTheme.setBaseColors(
             [QColorConstants.Red, QColorConstants.DarkRed, QColorConstants.Magenta]
         )
@@ -100,35 +104,40 @@ class Plotter(QObject):
         font.setPointSize(24.0)
         self.graph.activeTheme().setFont(QFont("Segoe UI"))
 
-        """ shadow quality """
+        """ 
+        shadows and camera quality 
+        """
         self.graph.setShadowQuality(QAbstract3DGraph.ShadowQualitySoftLow)
         self.graph.scene().activeCamera().setCameraPreset(
             Q3DCamera.CameraPresetIsometricRight
         )
         self.graph.scene().activeCamera().setZoomLevel(150.0)
-        proxy = QScatterDataProxy()
-        series = QScatter3DSeries(proxy)
 
-        # this is how an indidiaul point should be labelled when it is clicked on
-        # so the label here will be dipslayed in the graph view when a plotted item is clicked
-        series.setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel")
-        series.setMeshSmooth(self.m_smooth)
-        series.setItemSize(0.01)
-        self.graph.addSeries(series)
+        self.scatter_proxy = QScatterDataProxy()
+        self.scatter_series = QScatter3DSeries(self.scatter_proxy)
+        self.scatter_series.setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel")
+        self.scatter_series.setMeshSmooth(self.m_smooth)
+        self.scatter_series.setItemSize(0.1)
+        
+        self.graph.addSeries(self.scatter_series)
+        self.graph.seriesList()[0].setMesh(self.m_style)
+        self.graph.seriesList()[0].setMeshSmooth(self.m_smooth)
+        self.graph.setAspectRatio(1.0)
+
 
         """ Configure axis"""
         self.xaxis_proxy = QValue3DAxisFormatter()
-        self.xaxis = CreateAxis(self.xaxis_proxy, "X axis (azimuth)", True, 5, 2)
+        self.xaxis = CreateAxisHelper(self.xaxis_proxy, "X axis (azimuth)", True, 5, 2)
         self.graph.addAxis(self.xaxis)
         self.graph.setAxisX(self.xaxis)
 
         self.yaxis_proxy = QValue3DAxisFormatter()
-        self.yaxis = CreateAxis(self.yaxis_proxy, "Y axis (elevation)", True, 5, 2)
+        self.yaxis = CreateAxisHelper(self.yaxis_proxy, "Y axis (elevation)", True, 5, 2)
         self.graph.addAxis(self.yaxis)
         self.graph.setAxisY(self.yaxis)
 
         self.zaxis_proxy = QValue3DAxisFormatter()
-        self.zaxis = CreateAxis(self.zaxis_proxy, "Z axis (depth/range)", True, 5, 2)
+        self.zaxis = CreateAxisHelper(self.zaxis_proxy, "Z axis (depth/range)", True, 5, 2)
         self.graph.addAxis(self.zaxis)
         self.graph.setAxisZ(self.zaxis)
 
@@ -144,9 +153,7 @@ class Plotter(QObject):
         self.graph.axisY().setRange(Y_AXIS_MIN,Y_AXIS_MAX)
         self.graph.axisZ().setRange(Z_AXIS_MIN,Z_AXIS_MAX)
 
-        self.graph.seriesList()[0].setMesh(self.m_style)
-        self.graph.seriesList()[0].setMeshSmooth(self.m_smooth)
-        self.graph.setAspectRatio(1.0)
+
 
     """ Function to plot the given data point
       @param self The object pointer"""
@@ -156,9 +163,15 @@ class Plotter(QObject):
         new_item.setMeshFile(MESH_FILE_LOCATION)
         new_item.setScaling(QVector3D(0.005, 0.005, 0.005))
         new_item.setPosition(pos)
+        
+        self.counter += 1
+        print(self.counter)
         return new_item
         
-    def add_new_item(self, point):
+    def add_new_item_old(self, point):
         self.graph.addCustomItem(self.get_new_point(point))
         
-    
+    def add_new_item(self, pos):
+        point = QScatterDataItem(pos)
+        self.scatter_proxy.addItem(point)
+        

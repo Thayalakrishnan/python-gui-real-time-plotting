@@ -49,3 +49,10 @@ run real_time_plotter.py
 
 press connect on real_time_sender
 press connect on real_time_plotter
+
+
+
+## Todo
+add a counter label for both the simulation and the plotte so we know howmany 
+data points were sent and how many were received! checking to see if anything was lost
+also a counter for how many pints were plotted 
