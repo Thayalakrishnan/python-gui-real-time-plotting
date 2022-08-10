@@ -2,18 +2,16 @@
 RealTimePlotterWidget
 """
 import math
-from turtle import width
 
 from PyQt5 import QtSerialPort
-from PyQt5.QtCore import pyqtSlot, QSize, Qt, QTimer, QIODevice
+from PyQt5.QtCore import pyqtSlot, Qt, QTimer, QIODevice
 from PyQt5.QtWidgets import (
     QWidget,
-    QLineEdit,
     QTextEdit,
     QPushButton,
     QVBoxLayout,
     QHBoxLayout,
-    QSizePolicy,
+    QGroupBox
 )
 
 from PyQt5.QtDataVisualization import Q3DScatter
@@ -51,11 +49,7 @@ class RealTimePlotterWidget(QWidget):
         """
         Text and Line Edits
         """
-        self.lineedit_message = QLineEdit()
-        self.lineedit_message.setFixedSize(120, 50)
-
         self.textedit_output = QTextEdit(readOnly=True)
-        # self.textedit_output.setFixedWidth(500)
 
         """
         Timers (ms) 
@@ -74,9 +68,6 @@ class RealTimePlotterWidget(QWidget):
         """
         Buttons 
         """
-        self.button_send = QPushButton(text="Send to Board", clicked=self.send)
-        self.button_send.setFixedSize(120, 50)
-
         self.button_connect = QPushButton(
             text="Connect", checkable=True, toggled=self.on_toggled
         )
@@ -120,48 +111,9 @@ class RealTimePlotterWidget(QWidget):
         self.button_toggle_rotation.setFixedSize(120, 50)
         self.button_toggle_rotation.setStyleSheet(STYLE_BUTTON_TOGGLED_OFF)
         
-        
         self.lcd_plot_counter = LCDWidgetHelper("plot_counter", False, 120, 50)
         self.graph_instance.scatter_proxy.itemCountChanged.connect(self.lcd_plot_counter.display)
         
-        """
-        Layout 
-        """
-        hbox = QHBoxLayout(self)
-
-        vbox_buttons = QVBoxLayout()
-        vbox_buttons.addWidget(self.lineedit_message)
-        vbox_buttons.addWidget(self.button_send)
-        vbox_buttons.addWidget(self.button_connect)
-        vbox_buttons.addWidget(self.button_quick_scan)
-        vbox_buttons.addWidget(self.button_deep_scan)
-        vbox_buttons.addWidget(self.button_custom_scan)
-        vbox_buttons.addWidget(self.button_calibrate)
-        vbox_buttons.addWidget(self.button_ptu_control)
-        vbox_buttons.addWidget(self.button_help)
-        vbox_buttons.addWidget(self.button_reset_plot)
-        vbox_buttons.addWidget(self.lcd_plot_counter)
-        vbox_buttons.addWidget(self.button_toggle_rotation)
-        vbox_buttons.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
-        
-        vbox_texedit = QVBoxLayout()
-        vbox_texedit.addWidget(self.textedit_output)
-
-        hbox.addWidget(self.graph_container)
-        hbox.addLayout(vbox_texedit)
-        hbox.addLayout(vbox_buttons)
-        
-
-        """
-        Serial Connection configuration 
-        """
-        self.serial = QtSerialPort.QSerialPort(
-            COM_PORT, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive
-        )
-
-        self.serial.open(self.serial.ReadWrite)
-        self.setWindowTitle("Range Finder")
-
         """
         commands 
         """
@@ -175,7 +127,83 @@ class RealTimePlotterWidget(QWidget):
         self.command_h = "h"
 
         self.plotbank = []
-        self.counter = 0
+        self.counter = 0    
+        
+        """
+        Layout 
+        """
+        
+        gbox_live_plot = QGroupBox( title="Live Plot")
+        vbox_live_plot = QVBoxLayout()
+        vbox_live_plot.addWidget(self.graph_container)
+        gbox_live_plot.setLayout(vbox_live_plot)
+        
+        gbox_received_data = QGroupBox(title="Data Received")
+        vbox_received_data = QVBoxLayout()
+        vbox_received_data.addWidget(self.textedit_output)
+        gbox_received_data.setLayout(vbox_received_data)
+        
+        gbox_scan_controls = QGroupBox(title="Scans")
+        vbox_scan_controls = QVBoxLayout()
+        vbox_scan_controls.addWidget(self.button_quick_scan)
+        vbox_scan_controls.addWidget(self.button_deep_scan)
+        vbox_scan_controls.addWidget(self.button_custom_scan)
+        gbox_scan_controls.setLayout(vbox_scan_controls)
+        
+        gbox_board_controls = QGroupBox(title="Board Control")
+        vbox_board_controls = QVBoxLayout()
+        vbox_board_controls.addWidget(self.button_calibrate)
+        vbox_board_controls.addWidget(self.button_ptu_control)
+        vbox_board_controls.addWidget(self.button_help)
+        gbox_board_controls.setLayout(vbox_board_controls)
+        
+        gbox_graph_controls = QGroupBox(title="Graph Controls")
+        vbox_graph_controls = QVBoxLayout()
+        vbox_graph_controls.addWidget(self.button_reset_plot)
+        vbox_graph_controls.addWidget(self.button_toggle_rotation)
+        gbox_graph_controls.setLayout(vbox_graph_controls)
+        
+        gbox_plot_counter = QGroupBox(title="Points Plotted")
+        hbox_plot_counter = QHBoxLayout()
+        hbox_plot_counter.addWidget(self.lcd_plot_counter)
+        gbox_plot_counter.setLayout(hbox_plot_counter)
+        
+        gbox_serial_connection = QGroupBox(title="Serial Connection")
+        vbox_serial_connection = QVBoxLayout()
+        vbox_serial_connection.addWidget(self.button_connect)
+        gbox_serial_connection.setLayout(vbox_serial_connection)
+        
+        vbox_controls_1 = QVBoxLayout()
+        vbox_controls_1.addWidget(gbox_plot_counter)
+        vbox_controls_1.addWidget(gbox_scan_controls)
+        vbox_controls_1.addWidget(gbox_graph_controls)
+        vbox_controls_1.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+
+        vbox_controls_2 = QVBoxLayout()
+        vbox_controls_2.addWidget(gbox_serial_connection)
+        vbox_controls_2.addWidget(gbox_board_controls)
+        vbox_controls_2.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        
+        hbox = QHBoxLayout(self)
+        hbox.addWidget(gbox_live_plot)
+        hbox.addLayout(vbox_controls_1)
+        hbox.addLayout(vbox_controls_2)
+        hbox.addWidget(gbox_received_data)
+        self.setWindowTitle("Range Finder")    
+
+
+        """
+        Serial Connection configuration 
+        """
+        self.serial = QtSerialPort.QSerialPort(
+            COM_PORT, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive
+        )
+
+        self.serial.open(self.serial.ReadWrite)
+        
+
+
+
         
         
 
@@ -223,13 +251,11 @@ class RealTimePlotterWidget(QWidget):
     # """
 
     @pyqtSlot()
-    def send(self):
-        # self.serial.write(self.lineedit_message.text().encode())
-        command = f'{"hello"}\r\n'
+    def send(self, msg):
+        command = f'{msg}\r\n'
         self.serial.write(command.encode())
         self.textedit_output.append(f"[Sent] {command}")
-        # self.serial.waitForBytesWritten(1000)
-
+        
     """ 
     # Method to create a serial connection with the board
     # @param self The object pointer
