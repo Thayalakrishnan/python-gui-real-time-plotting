@@ -53,17 +53,11 @@ def CreateAxisHelper(
 class Plotter(QObject):
     def __init__(self):
         super(Plotter, self).__init__()
-        self.graph = Q3DScatter()  # graph instance passed in as arument
-        self.m_fontSize = 16
-        self.m_style = QAbstract3DSeries.MeshSphere
-        self.m_smooth = True
-        self.plot_timer = QTimer()
-        
+        self.graph = Q3DScatter()  # graph instance passed in as arument        
         self.counter = 0
 
         self.graph_container = QWidget.createWindowContainer(self.graph)
         self.graph_container.setMinimumSize(QSize(500, 500))
-        # self.graph_container.setMaximumSize(screenSize)
         self.graph_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.graph_container.setFocusPolicy(Qt.StrongFocus)
 
@@ -73,9 +67,6 @@ class Plotter(QObject):
         customTheme.setBackgroundColor(QColor(42, 42, 42))
         customTheme.setBackgroundEnabled(True)
         customTheme.setBackgroundEnabled(False)
-        customTheme.setBaseColors(
-            [QColorConstants.Red, QColorConstants.DarkRed, QColorConstants.Magenta]
-        )
         customTheme.setColorStyle(Q3DTheme.ColorStyleUniform)
         customTheme.setFont(QFont("Segoe UI"))
         customTheme.setGridEnabled(True)
@@ -96,7 +87,7 @@ class Plotter(QObject):
 
         # window
         customTheme.setWindowColor(QColor(42, 42, 42))
-        self.graph.activeTheme().setType(Q3DTheme.ThemeUserDefined)
+        #self.graph.activeTheme().setType(Q3DTheme.ThemeUserDefined)
 
         """ font """
         font = self.graph.activeTheme().font()
@@ -163,4 +154,18 @@ class Plotter(QObject):
     def reset_graph(self):
         self.scatter_proxy = QScatterDataProxy()
         self.scatter_series.setDataProxy(self.scatter_proxy)
+        self.counter = 0
         
+    
+    def enable_rotation(self):
+        self.plot_timer = QTimer()
+        self.plot_timer.setInterval(10)
+        self.plot_timer.timeout.connect(self.rotate_x_axis)
+        self.plot_timer.start()
+
+    def disable_rotation(self):
+        self.plot_timer.stop()
+    
+    def rotate_x_axis(self):
+        x_rot = self.graph.scene().activeCamera().xRotation()        
+        self.graph.scene().activeCamera().setXRotation(x_rot + 0.5)

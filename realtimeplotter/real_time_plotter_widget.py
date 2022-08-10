@@ -22,7 +22,7 @@ from PyQt5.QtGui import QVector3D
 from realtimeplotter.plotter import Plotter
 from realtimeplotter.detailed_graph_widget import DetailedGraphWidget
 from realtimeplotter.custom_scan_widget import CustomScanWidget
-from realtimeplotter.helpers import GenericLayoutHelper
+from realtimeplotter.helpers import GenericLayoutHelper, LCDWidgetHelper
 
 """ 
 RangeFinder Class
@@ -37,6 +37,9 @@ Methods from this class control the user interaction.
 
 
 COM_PORT = "COM5"
+
+STYLE_BUTTON_TOGGLED_OFF = "background-color:red;color:black;"
+STYLE_BUTTON_TOGGLED_ON = "background-color:green;color:white;"
 
 class RealTimePlotterWidget(QWidget):
     """
@@ -77,7 +80,7 @@ class RealTimePlotterWidget(QWidget):
         self.button_connect = QPushButton(
             text="Connect", checkable=True, toggled=self.on_toggled
         )
-        self.button_connect.setStyleSheet("background-color: red")
+        self.button_connect.setStyleSheet(STYLE_BUTTON_TOGGLED_OFF)
         self.button_connect.setFixedSize(120, 50)
 
         self.button_quick_scan = QPushButton()
@@ -104,14 +107,22 @@ class RealTimePlotterWidget(QWidget):
         self.button_help.setFixedSize(120, 50)
         self.button_help.setText("Help!?")
 
-        self.button_reset_plot = QPushButton(
-            self,
-            text="Reset Plot", 
-            clicked=self.button_reset_plot_click
-        )
+        self.button_reset_plot = QPushButton(self,text="Reset Plot", clicked=self.button_reset_plot_click)
         self.button_reset_plot.setFixedSize(120, 50)
-        #self.button_reset_plot.setText("Reset Plot")
         
+        
+        self.button_toggle_rotation = QPushButton(
+            self,
+            text="Enable Auto Rotation", 
+            checkable=True, 
+            toggled=self.toggle_rotation
+        )
+        self.button_toggle_rotation.setFixedSize(120, 50)
+        self.button_toggle_rotation.setStyleSheet(STYLE_BUTTON_TOGGLED_OFF)
+        
+        
+        self.lcd_plot_counter = LCDWidgetHelper("plot_counter", False, 120, 50)
+        self.graph_instance.scatter_proxy.itemCountChanged.connect(self.lcd_plot_counter.display)
         
         """
         Layout 
@@ -129,6 +140,8 @@ class RealTimePlotterWidget(QWidget):
         vbox_buttons.addWidget(self.button_ptu_control)
         vbox_buttons.addWidget(self.button_help)
         vbox_buttons.addWidget(self.button_reset_plot)
+        vbox_buttons.addWidget(self.lcd_plot_counter)
+        vbox_buttons.addWidget(self.button_toggle_rotation)
         vbox_buttons.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
         
         vbox_texedit = QVBoxLayout()
@@ -163,6 +176,8 @@ class RealTimePlotterWidget(QWidget):
 
         self.plotbank = []
         self.counter = 0
+        
+        
 
     """
     Method to read from serial, convert the data and send it to be plotted  
@@ -174,11 +189,7 @@ class RealTimePlotterWidget(QWidget):
         while self.serial.canReadLine():
             raw_input_data = self.serial.readLine().data().decode()
             x_val, y_val, z_val = map(int, raw_input_data.rstrip("\r\n").split(","))
-            #self.textedit_output.append(f"({x_val}, {y_val}, {z_val})")
-            
-            self.counter += 1
-            self.textedit_output.append(f"{self.counter}")
-            
+            self.textedit_output.append(f"({x_val}, {y_val}, {z_val})")
             pos = QVector3D(x_val, z_val, y_val)
             self.graph_instance.add_new_item(pos)
             
@@ -229,7 +240,7 @@ class RealTimePlotterWidget(QWidget):
         self.textedit_output.append(f"{'Connected' if checked else 'Disconnected'}")
         self.button_connect.setText("Disconnect" if checked else "Connect")
         self.button_connect.setStyleSheet(
-            "background-color: green" if checked else "background-color: red"
+           STYLE_BUTTON_TOGGLED_ON if checked else STYLE_BUTTON_TOGGLED_OFF
         )
         if checked:
             if not self.serial.isOpen():
@@ -340,3 +351,17 @@ class RealTimePlotterWidget(QWidget):
     def button_reset_plot_click(self):
         self.graph_instance.reset_graph()
         print("Reset!")
+        
+    @pyqtSlot(bool) 
+    def toggle_rotation(self, checked):
+        self.button_toggle_rotation.setStyleSheet(
+            STYLE_BUTTON_TOGGLED_ON if checked else STYLE_BUTTON_TOGGLED_OFF
+        )
+        self.button_toggle_rotation.setText(
+            "Disable Rotation" if checked else "Enable Rotation"
+        )
+        
+        if (checked):
+            self.graph_instance.enable_rotation()
+        else:
+            self.graph_instance.disable_rotation()
