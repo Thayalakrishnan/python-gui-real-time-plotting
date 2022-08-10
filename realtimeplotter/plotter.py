@@ -95,7 +95,6 @@ class Plotter(QObject):
         customTheme.setSingleHighlightColor(QColor(QColorConstants.White))
 
         # window
-        # customTheme.setWindowColor(QColor(QColorConstants.Black))
         customTheme.setWindowColor(QColor(42, 42, 42))
         self.graph.activeTheme().setType(Q3DTheme.ThemeUserDefined)
 
@@ -112,15 +111,19 @@ class Plotter(QObject):
             Q3DCamera.CameraPresetIsometricRight
         )
         self.graph.scene().activeCamera().setZoomLevel(150.0)
-
+        
+        """
+        set scatter series
+        """
         self.scatter_proxy = QScatterDataProxy()
         self.scatter_series = QScatter3DSeries(self.scatter_proxy)
         self.scatter_series.setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel")
-        self.scatter_series.setMeshSmooth(self.m_smooth)
+        self.scatter_series.setMesh(QAbstract3DSeries.MeshSphere)
+        self.scatter_series.setMeshSmooth(True)
         self.scatter_series.setItemSize(0.1)
+        self.scatter_series.setBaseColor(QColor(220, 20, 60))
+        
         self.graph.addSeries(self.scatter_series)
-        #self.graph.seriesList()[0].setMesh(self.m_style)
-        #self.graph.seriesList()[0].setMeshSmooth(self.m_smooth)
         self.graph.setAspectRatio(1.0)
 
 
@@ -152,23 +155,6 @@ class Plotter(QObject):
         self.graph.axisY().setRange(Y_AXIS_MIN,Y_AXIS_MAX)
         self.graph.axisZ().setRange(Z_AXIS_MIN,Z_AXIS_MAX)
 
-
-
-    """ Function to plot the given data point
-      @param self The object pointer"""
-
-    def get_new_point(self, pos):
-        new_item = QCustom3DItem()
-        new_item.setMeshFile(MESH_FILE_LOCATION)
-        new_item.setScaling(QVector3D(0.005, 0.005, 0.005))
-        new_item.setPosition(pos)
-        
-        self.counter += 1
-        print(self.counter)
-        return new_item
-        
-    def add_new_item_old(self, point):
-        self.graph.addCustomItem(self.get_new_point(point))
         
     def add_new_item(self, pos):
         point = QScatterDataItem(pos)
@@ -177,8 +163,4 @@ class Plotter(QObject):
     def reset_graph(self):
         self.scatter_proxy = QScatterDataProxy()
         self.scatter_series.setDataProxy(self.scatter_proxy)
-
-    def new_series(self):
-        self.scatter_proxy = QScatterDataProxy()
-        self.scatter_series = QScatter3DSeries(self.scatter_proxy)
         
