@@ -118,10 +118,9 @@ class Plotter(QObject):
         self.scatter_series.setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel")
         self.scatter_series.setMeshSmooth(self.m_smooth)
         self.scatter_series.setItemSize(0.1)
-        
         self.graph.addSeries(self.scatter_series)
-        self.graph.seriesList()[0].setMesh(self.m_style)
-        self.graph.seriesList()[0].setMeshSmooth(self.m_smooth)
+        #self.graph.seriesList()[0].setMesh(self.m_style)
+        #self.graph.seriesList()[0].setMeshSmooth(self.m_smooth)
         self.graph.setAspectRatio(1.0)
 
 
@@ -176,5 +175,10 @@ class Plotter(QObject):
         self.scatter_proxy.addItem(point)
 
     def reset_graph(self):
-        self.scatter_proxy.resetArray()
+        self.scatter_proxy = QScatterDataProxy()
+        self.scatter_series.setDataProxy(self.scatter_proxy)
+
+    def new_series(self):
+        self.scatter_proxy = QScatterDataProxy()
+        self.scatter_series = QScatter3DSeries(self.scatter_proxy)
         
