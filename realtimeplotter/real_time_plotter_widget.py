@@ -39,6 +39,9 @@ COM_PORT = "COM5"
 STYLE_BUTTON_TOGGLED_OFF = "background-color:red;color:black;"
 STYLE_BUTTON_TOGGLED_ON = "background-color:green;color:white;"
 
+BUTTON_WIDTH = 120
+BUTTON_HEIGHT = 50
+
 class RealTimePlotterWidget(QWidget):
     """
     The constructor.
@@ -50,6 +53,7 @@ class RealTimePlotterWidget(QWidget):
         Text and Line Edits
         """
         self.textedit_output = QTextEdit(readOnly=True)
+        self.textedit_output.maximumWidth(300)
 
         """
         Timers (ms) 
@@ -72,34 +76,34 @@ class RealTimePlotterWidget(QWidget):
             text="Connect", checkable=True, toggled=self.on_toggled
         )
         self.button_connect.setStyleSheet(STYLE_BUTTON_TOGGLED_OFF)
-        self.button_connect.setFixedSize(120, 50)
+        self.button_connect.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 
         self.button_quick_scan = QPushButton()
-        self.button_quick_scan.setFixedSize(120, 50)
+        self.button_quick_scan.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         self.button_quick_scan.setText("Quick Scan")
 
         self.button_deep_scan = QPushButton()
-        self.button_deep_scan.setFixedSize(120, 50)
+        self.button_deep_scan.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         self.button_deep_scan.setText("Deep Scan")
 
         self.button_custom_scan = QPushButton()
-        self.button_custom_scan.setFixedSize(120, 50)
+        self.button_custom_scan.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         self.button_custom_scan.setText("Custom Scan")
 
         self.button_calibrate = QPushButton()
-        self.button_calibrate.setFixedSize(120, 50)
+        self.button_calibrate.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         self.button_calibrate.setText("Calibrate")
 
         self.button_ptu_control = QPushButton()
-        self.button_ptu_control.setFixedSize(120, 50)
+        self.button_ptu_control.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         self.button_ptu_control.setText("PTU Control")
 
         self.button_help = QPushButton()
-        self.button_help.setFixedSize(120, 50)
+        self.button_help.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         self.button_help.setText("Help!?")
 
         self.button_reset_plot = QPushButton(self,text="Reset Plot", clicked=self.button_reset_plot_click)
-        self.button_reset_plot.setFixedSize(120, 50)
+        self.button_reset_plot.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         
         
         self.button_toggle_rotation = QPushButton(
@@ -108,10 +112,10 @@ class RealTimePlotterWidget(QWidget):
             checkable=True, 
             toggled=self.toggle_rotation
         )
-        self.button_toggle_rotation.setFixedSize(120, 50)
+        self.button_toggle_rotation.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         self.button_toggle_rotation.setStyleSheet(STYLE_BUTTON_TOGGLED_OFF)
         
-        self.lcd_plot_counter = LCDWidgetHelper("plot_counter", False, 120, 50)
+        self.lcd_plot_counter = LCDWidgetHelper("plot_counter", False, BUTTON_WIDTH, BUTTON_HEIGHT)
         self.graph_instance.scatter_proxy.itemCountChanged.connect(self.lcd_plot_counter.display)
         
         """
