@@ -6,12 +6,15 @@ import math
 from PyQt5 import QtSerialPort
 from PyQt5.QtCore import pyqtSlot, Qt, QTimer, QIODevice
 from PyQt5.QtWidgets import (
+    QLCDNumber,
     QWidget,
     QTextEdit,
     QPushButton,
     QVBoxLayout,
     QHBoxLayout,
-    QGroupBox
+    QGroupBox,
+    QGridLayout,
+    QFrame
 )
 
 from PyQt5.QtDataVisualization import Q3DScatter
@@ -42,6 +45,13 @@ STYLE_BUTTON_TOGGLED_ON = "background-color:green;color:white;"
 BUTTON_WIDTH = 120
 BUTTON_HEIGHT = 50
 
+
+STYLESHEET = """
+* {
+    font-size: 16px;
+}
+"""
+
 class RealTimePlotterWidget(QWidget):
     """
     The constructor.
@@ -53,8 +63,8 @@ class RealTimePlotterWidget(QWidget):
         Text and Line Edits
         """
         self.textedit_output = QTextEdit(readOnly=True)
-        self.textedit_output.maximumWidth(300)
-
+        
+        
         """
         Timers (ms) 
         """
@@ -76,48 +86,51 @@ class RealTimePlotterWidget(QWidget):
             text="Connect", checkable=True, toggled=self.on_toggled
         )
         self.button_connect.setStyleSheet(STYLE_BUTTON_TOGGLED_OFF)
-        self.button_connect.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_connect.setFixedHeight(BUTTON_HEIGHT)
 
         self.button_quick_scan = QPushButton()
-        self.button_quick_scan.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_quick_scan.setFixedHeight(BUTTON_HEIGHT)
         self.button_quick_scan.setText("Quick Scan")
 
         self.button_deep_scan = QPushButton()
-        self.button_deep_scan.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_deep_scan.setFixedHeight(BUTTON_HEIGHT)
         self.button_deep_scan.setText("Deep Scan")
 
         self.button_custom_scan = QPushButton()
-        self.button_custom_scan.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_custom_scan.setFixedHeight(BUTTON_HEIGHT)
         self.button_custom_scan.setText("Custom Scan")
 
         self.button_calibrate = QPushButton()
-        self.button_calibrate.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_calibrate.setFixedHeight(BUTTON_HEIGHT)
         self.button_calibrate.setText("Calibrate")
 
         self.button_ptu_control = QPushButton()
-        self.button_ptu_control.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_ptu_control.setFixedHeight(BUTTON_HEIGHT)
         self.button_ptu_control.setText("PTU Control")
 
         self.button_help = QPushButton()
-        self.button_help.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_help.setFixedHeight(BUTTON_HEIGHT)
         self.button_help.setText("Help!?")
 
         self.button_reset_plot = QPushButton(self,text="Reset Plot", clicked=self.button_reset_plot_click)
-        self.button_reset_plot.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_reset_plot.setFixedHeight(BUTTON_HEIGHT)
         
         
         self.button_toggle_rotation = QPushButton(
             self,
-            text="Enable Auto Rotation", 
+            text="Enable Rotation", 
             checkable=True, 
             toggled=self.toggle_rotation
         )
-        self.button_toggle_rotation.setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.button_toggle_rotation.setFixedHeight(BUTTON_HEIGHT)
         self.button_toggle_rotation.setStyleSheet(STYLE_BUTTON_TOGGLED_OFF)
         
-        self.lcd_plot_counter = LCDWidgetHelper("plot_counter", False, BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.lcd_plot_counter = QLCDNumber()
+        self.lcd_plot_counter.setFixedHeight(BUTTON_HEIGHT)
+        self.lcd_plot_counter.setFrameShape(QFrame.NoFrame)
+        self.lcd_plot_counter.setFrameShadow(QFrame.Plain)
+        self.lcd_plot_counter.setSmallDecimalPoint(False)
         self.graph_instance.scatter_proxy.itemCountChanged.connect(self.lcd_plot_counter.display)
-        
         """
         commands 
         """
@@ -137,7 +150,7 @@ class RealTimePlotterWidget(QWidget):
         Layout 
         """
         
-        gbox_live_plot = QGroupBox( title="Live Plot")
+        gbox_live_plot = QGroupBox(title="Live Plot")
         vbox_live_plot = QVBoxLayout()
         vbox_live_plot.addWidget(self.graph_container)
         gbox_live_plot.setLayout(vbox_live_plot)
@@ -162,10 +175,10 @@ class RealTimePlotterWidget(QWidget):
         gbox_board_controls.setLayout(vbox_board_controls)
         
         gbox_graph_controls = QGroupBox(title="Graph Controls")
-        vbox_graph_controls = QVBoxLayout()
-        vbox_graph_controls.addWidget(self.button_reset_plot)
-        vbox_graph_controls.addWidget(self.button_toggle_rotation)
-        gbox_graph_controls.setLayout(vbox_graph_controls)
+        hbox_graph_controls = QHBoxLayout()
+        hbox_graph_controls.addWidget(self.button_reset_plot)
+        hbox_graph_controls.addWidget(self.button_toggle_rotation)
+        gbox_graph_controls.setLayout(hbox_graph_controls)
         
         gbox_plot_counter = QGroupBox(title="Points Plotted")
         hbox_plot_counter = QHBoxLayout()
@@ -177,23 +190,27 @@ class RealTimePlotterWidget(QWidget):
         vbox_serial_connection.addWidget(self.button_connect)
         gbox_serial_connection.setLayout(vbox_serial_connection)
         
-        vbox_controls_1 = QVBoxLayout()
-        vbox_controls_1.addWidget(gbox_plot_counter)
-        vbox_controls_1.addWidget(gbox_scan_controls)
-        vbox_controls_1.addWidget(gbox_graph_controls)
-        vbox_controls_1.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
-
-        vbox_controls_2 = QVBoxLayout()
-        vbox_controls_2.addWidget(gbox_serial_connection)
-        vbox_controls_2.addWidget(gbox_board_controls)
-        vbox_controls_2.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        gridLayout = QGridLayout(self)
+        gbox_received_data.setMaximumWidth(300)
+        gbox_graph_controls.setMaximumWidth(300)
+        gbox_serial_connection.setMaximumWidth(300)
+        gbox_plot_counter.setMaximumWidth(300)
         
-        hbox = QHBoxLayout(self)
-        hbox.addWidget(gbox_live_plot)
-        hbox.addLayout(vbox_controls_1)
-        hbox.addLayout(vbox_controls_2)
-        hbox.addWidget(gbox_received_data)
-        self.setWindowTitle("Range Finder")    
+        gridLayout.addWidget(gbox_live_plot, 0, 0 , 5 , 1)
+        
+        gridLayout.addWidget(gbox_serial_connection, 0, 1, 1, 2)
+        gridLayout.addWidget(gbox_plot_counter, 1, 1, 1 , 2)
+        
+        gridLayout.addWidget(gbox_board_controls, 2, 1)
+        gridLayout.addWidget(gbox_scan_controls, 2, 2)
+        
+        gridLayout.addWidget(gbox_graph_controls, 3, 1, 1 , 2)
+        
+        gridLayout.addWidget(gbox_received_data, 4, 1, 1, 2)
+
+        self.setLayout(gridLayout)
+        self.setWindowTitle("Live Data Plotter")    
+        self.setStyleSheet(STYLESHEET)
 
 
         """

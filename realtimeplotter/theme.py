@@ -1,4 +1,5 @@
-from PyQt5.QtGui import QColor, QPalette
+from PyQt5.QtGui import QColor, QPalette, QBrush
+from PyQt5.QtCore import Qt
 
 
 """ Provides the Dark Theme """
@@ -8,28 +9,38 @@ def ApplicationTheme() -> QPalette:
     palette = QPalette()
 
     # base
-    palette.setColor(QPalette.WindowText, QColor(180, 180, 180))
     palette.setColor(QPalette.Window, QColor(53, 53, 53))
+    
+    # brush_window = QBrush()
+    # brush_window.setStyle(Qt.Dense4Pattern)
+    # brush_window.setStyle(Qt.DiagCrossPattern)
+    # brush_window.setColor(QColor(100, 100, 100))
+    
+    palette.setBrush(QPalette.Window, brush_window)
+    palette.setColor(QPalette.WindowText, QColor(180, 180, 180))
+
 
     palette.setColor(QPalette.Light, QColor(180, 180, 180))
     palette.setColor(QPalette.Midlight, QColor(90, 90, 90))
+    # palette.setColor(QPalette.Mid, QColor(50, 50, 50))
     palette.setColor(QPalette.Dark, QColor(35, 35, 35))
+    palette.setColor(QPalette.Shadow, QColor(20, 20, 20))
 
     palette.setColor(QPalette.Button, QColor(53, 53, 53))
     palette.setColor(QPalette.ButtonText, QColor(180, 180, 180))
 
     palette.setColor(QPalette.Base, QColor(42, 42, 42))
-    palette.setColor(QPalette.Shadow, QColor(20, 20, 20))
+    palette.setColor(QPalette.AlternateBase, QColor(66, 66, 66))
+    
     palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
-
-    palette.setColor(QPalette.Text, QColor(180, 180, 180))
-    palette.setColor(QPalette.BrightText, QColor(180, 180, 180))
     palette.setColor(QPalette.HighlightedText, QColor(180, 180, 180))
 
-    palette.setColor(QPalette.AlternateBase, QColor(66, 66, 66))
+    palette.setColor(QPalette.Text, QColor(180, 180, 180))
+    palette.setColor(QPalette.PlaceholderText, QColor(180, 180, 180))
+    palette.setColor(QPalette.BrightText, QColor(180, 180, 180))
 
-    palette.setColor(QPalette.ToolTipBase, QColor(53, 53, 53))
     palette.setColor(QPalette.ToolTipText, QColor(180, 180, 180))
+    palette.setColor(QPalette.ToolTipBase, QColor(53, 53, 53))
 
     palette.setColor(QPalette.Link, QColor(56, 252, 196))
     palette.setColor(QPalette.LinkVisited, QColor(80, 80, 80))
