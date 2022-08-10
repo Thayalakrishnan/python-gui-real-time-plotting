@@ -10,19 +10,12 @@ def ApplicationTheme() -> QPalette:
 
     # base
     palette.setColor(QPalette.Window, QColor(53, 53, 53))
-    
-    # brush_window = QBrush()
-    # brush_window.setStyle(Qt.Dense4Pattern)
-    # brush_window.setStyle(Qt.DiagCrossPattern)
-    # brush_window.setColor(QColor(100, 100, 100))
-    
-    palette.setBrush(QPalette.Window, brush_window)
     palette.setColor(QPalette.WindowText, QColor(180, 180, 180))
 
 
     palette.setColor(QPalette.Light, QColor(180, 180, 180))
     palette.setColor(QPalette.Midlight, QColor(90, 90, 90))
-    # palette.setColor(QPalette.Mid, QColor(50, 50, 50))
+    palette.setColor(QPalette.Mid, QColor(50, 50, 50))
     palette.setColor(QPalette.Dark, QColor(35, 35, 35))
     palette.setColor(QPalette.Shadow, QColor(20, 20, 20))
 
@@ -52,7 +45,11 @@ def ApplicationTheme() -> QPalette:
     palette.setColor(QPalette.Disabled, QPalette.Highlight, QColor(80, 80, 80))
     palette.setColor(QPalette.Disabled, QPalette.HighlightedText, QColor(127, 127, 127))
 
-    # app.setPalette(palette)
+    # brush_window = QBrush()
+    # brush_window.setStyle(Qt.Dense4Pattern)
+    # brush_window.setStyle(Qt.DiagCrossPattern)
+    # brush_window.setColor(QColor(100, 100, 100))    
+    # palette.setBrush(QPalette.Window, brush_window)
     return palette
 
 
@@ -118,3 +115,19 @@ def ScatterGraphTheme() -> QPalette:
 
     # app.setPalette(darkPalette)
     return theme
+"""
+start 
+
+maximise
+adjust view
+click connect
+send scatter data
+reset plot
+enable rotation
+send scatter plot
+reset
+send demo data
+
+fin
+
+"""
